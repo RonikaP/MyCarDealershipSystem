@@ -1,8 +1,10 @@
 package persistance;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 
-public class DealershipLayer {
+public class DealershipLayer implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String m_name;
 	private String m_location;
 	private int m_capacity;

@@ -55,8 +55,7 @@ public class FirstLaunchPage extends JFrame {
 		panel.add(lblNewLabel_2);
 
 		JButton btnNewButton = new JButton("Go");
-
-		btnNewButton.setForeground(Color.WHITE);
+		btnNewButton.setForeground(Color.BLACK);
 		btnNewButton.setBackground(new Color(241, 57, 83));
 		btnNewButton.setBounds(356, 277, 203, 30);
 		contentPane.add(btnNewButton);

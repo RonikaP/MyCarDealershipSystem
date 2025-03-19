@@ -2,6 +2,9 @@ package carDealership;
 
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 import persistance.DealershipLayer;
 
 import java.io.*;
@@ -12,15 +15,36 @@ public class Main {
 	public static Dealership m_dealership;
 
 	public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
-		var dealership = new DealershipLayer();
-
-		// TODO: Add a method in DBManager to tell if the database was just created and
-		// use it here
-		if (!dealership.existsAndSet()) {
-			FirstLaunchPage newPage = new FirstLaunchPage();
-		} else {
-			m_dealership = new Dealership(dealership.getNname(), dealership.getLocation(), dealership.getCapacity());
-			Frame myFrame = new Frame();
+		try {
+			var dealershipLayer = new DealershipLayer();
+			if (!dealershipLayer.existsAndSet()) {
+				SwingUtilities.invokeLater(() -> {
+					new FirstLaunchPage();
+				});
+			} else {
+				// Try to load Dealership from save.data
+				File saveFile = new File("save.data");
+				if (saveFile.exists()) {
+					try (FileInputStream fileIn = new FileInputStream(saveFile);
+						 ObjectInputStream objIn = new ObjectInputStream(fileIn)) {
+						m_dealership = (Dealership) objIn.readObject();
+					} catch (Exception e) {
+						System.err.println("Error loading dealership from save.data: " + e.getMessage());
+						// Fallback to creating a new Dealership
+						m_dealership = new Dealership(dealershipLayer.getNname(), dealershipLayer.getLocation(), dealershipLayer.getCapacity());
+					}
+				} else {
+					// If save.data doesn't exist, create a new Dealership
+					m_dealership = new Dealership(dealershipLayer.getNname(), dealershipLayer.getLocation(), dealershipLayer.getCapacity());
+				}
+				SwingUtilities.invokeLater(() -> {
+					LoginFrame loginFrame = new LoginFrame(m_dealership);
+					loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+					loginFrame.setVisible(true);
+				});
+			}
+		} catch (Exception e) {
+			System.err.println("Error in main: " + e.getMessage());
 		}
 	}
 

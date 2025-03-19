@@ -3,7 +3,7 @@ package carDealership;
 import java.io.Serializable;
 
 public abstract class Vehicle implements Serializable {
-	private static final long serialVersionUID = -8537773978564014927L;
+	private static final long serialVersionUID = 1L;
 	protected String make, model, color;
 	protected int year;
 	protected double price;

@@ -1,11 +1,18 @@
 package carDealership;
 
+import persistance.DBManager;
 import persistance.DealershipLayer;
 
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
-public class Dealership {
+public class Dealership implements Serializable {
+	private static final long serialVersionUID = 1L;
 	private String name;
 	private String location;
 	private int nv;
@@ -13,7 +20,8 @@ public class Dealership {
 	private Vehicle[] inventory;
 	private Sale[] sales;
 	private int nextId;
-	private DealershipLayer m_dealershipLayer;
+	private transient DealershipLayer m_dealershipLayer;
+
 
 	public Dealership(String name, String location, int maxInventory) throws SQLException {
 		this.name = name;
@@ -23,8 +31,24 @@ public class Dealership {
 		nv = 0;
 		ns = 0;
 		nextId = 0;
-
+	
 		m_dealershipLayer = new DealershipLayer(name, location, maxInventory);
+
+	}
+
+		private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+        in.defaultReadObject();
+        try {
+            if (name != null && location != null && inventory != null) {
+                m_dealershipLayer = new DealershipLayer(name, location, inventory.length);
+            }
+        } catch (SQLException e) {
+            throw new IOException("Failed to reinitialize DealershipLayer during deserialization", e);
+        }
+    }
+	
+	public String getName() {
+		return this.name;
 	}
 
 	public void getInfo() {
@@ -174,6 +198,10 @@ public class Dealership {
 		return string;
 	}
 
+	public Vehicle[] getVehicles() {
+		return inventory;
+	}
+
 	public boolean isFull() {
 		return nv == inventory.length;
 	}
@@ -278,6 +306,57 @@ public class Dealership {
 		}
 		return car;
 	}
+
+
+	// New methods for user management via database
+		public List<User> getUsers() throws SQLException {
+			List<User> users = new ArrayList<>();
+			DBManager db = DBManager.getInstance();
+			ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r ON u.role_id = r.role_id");
+			while (rs.next()) {
+				String role = rs.getString("role_name");
+				String password = rs.getString("password"); 
+				boolean isTempPassword = rs.getInt("is_temp_password") == 1;
+				boolean isActive = rs.getInt("is_active") == 1;
+
+				switch (role) {
+					case "Admin":
+						users.add(new Admin(rs.getInt("user_id"), rs.getString("username"), password,
+								rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+						break;
+					case "Manager":
+						users.add(new Manager(rs.getInt("user_id"), rs.getString("username"), password,
+								rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+						break;
+					case "Salesperson":
+						users.add(new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
+								rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+						break;
+				}
+			}
+			return users;
+		}
+
+		public void updateUser(User user) throws SQLException, Exception {
+			DBManager db = DBManager.getInstance();
+			String query = "UPDATE users SET password = '" + user.password + "', name = '" + user.name + "', " +
+					"email = '" + user.email + "', phone = '" + user.phone + "', is_active = " + (user.isActive ? 1 : 0) +
+					" WHERE user_id = " + user.getId();
+			db.runUpdate(query);
+		}
+
+		// Simulate password reset requests (no table exists yet)
+		public List<User> getPasswordResetRequests() throws SQLException {
+			// For now, return a subset of users as a simulation
+			List<User> requests = new ArrayList<>();
+			List<User> allUsers = getUsers();
+			for (User u : allUsers) {
+				if (u.getUsername().startsWith("sales")) { // Arbitrary condition for demo
+					requests.add(u);
+				}
+			}
+			return requests;
+		}
 
 	// Dealership End
 

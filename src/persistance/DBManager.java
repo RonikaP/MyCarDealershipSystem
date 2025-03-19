@@ -21,18 +21,35 @@ public class DBManager {
 		initDB();
 	}
 
-	public void runInsert(String query) throws SQLException {
-		System.out.println("Will run insert query: " + query);
-		var stmt = m_connection.createStatement();
-		stmt.execute(query);
+	public void runInsert(String query, Object... params) throws SQLException {
+		var stmt = m_connection.prepareStatement(query);
+		for (int i = 0; i < params.length; i++) {
+			stmt.setObject(i + 1, params[i]);
+		}
+		stmt.execute();
 		m_connection.commit();
 	}
 
-	public ResultSet runQuery(String query) throws SQLException {
+	public ResultSet runQuery(String query, Object... params) throws SQLException {
 		System.out.println("Will run query: " + query);
-		var stmt = m_connection.createStatement();
-		return stmt.executeQuery(query);
+		var stmt = m_connection.prepareStatement(query);
+		for (int i = 0; i < params.length; i++) {
+			stmt.setObject(i + 1, params[i]);
+		}
+		return stmt.executeQuery();
 	}
+
+	// Added runUpdate method
+	public void runUpdate(String query, Object... params) throws SQLException {
+		System.out.println("Will run update query: " + query);
+		var stmt = m_connection.prepareStatement(query);
+		for (int i = 0; i < params.length; i++) {
+			stmt.setObject(i + 1, params[i]);
+		}
+		stmt.execute();
+		m_connection.commit();
+	}
+
 
 	private void initDB() throws SQLException {
 		var dbFile = new File(m_dbPath);
@@ -63,25 +80,45 @@ public class DBManager {
 		var stmt = m_connection.createStatement();
 		stmt.execute(dealershipSQL);
 
-		var userSQL = "CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-				+ " name text NOT NULL, passWord text NOT NULL, roleId INTEGER);";
+
+		// Modified users table schema
+		var userSQL = "CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+              "username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, role_id INTEGER, " +
+              "name TEXT NOT NULL, email TEXT, phone TEXT, is_active BOOLEAN DEFAULT TRUE, " +
+              "join_date DATE DEFAULT CURRENT_DATE, FOREIGN KEY (role_id) REFERENCES roles(role_id));";
 
 		stmt.execute(userSQL);
-		
 
-		var roleSQL = "CREATE TABLE IF NOT EXISTS roles (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-		+ " role text NOT NULL);";
+		// Modified roles table schema
+		var roleSQL = "CREATE TABLE IF NOT EXISTS roles (role_id INTEGER PRIMARY KEY AUTOINCREMENT,"
+		+ " role_name text NOT NULL);";
 
 		stmt.execute(roleSQL);
 
-		var addAdminRoleSQL = "INSERT INTO roles (role) VALUES ('Admin');";
+		var addAdminRoleSQL = "INSERT INTO roles (role_name) VALUES ('Admin');";
 		stmt.execute(addAdminRoleSQL);
 
-		var addManagerRoleSQL = "INSERT INTO roles (role) VALUES ('Manager');";
+		var addManagerRoleSQL = "INSERT INTO roles (role_name) VALUES ('Manager');";
 		stmt.execute(addManagerRoleSQL);
 		
-		var addSalesPersonRoleSQL = "INSERT INTO roles (role) VALUES ('Salesperson');";
+		var addSalesPersonRoleSQL = "INSERT INTO roles (role_name) VALUES ('Salesperson');";
 		stmt.execute(addSalesPersonRoleSQL);
+
+
+		// Added Vehicles and Sales tables
+		System.out.println("Creating the Vehicle table");
+		stmt.execute("CREATE TABLE IF NOT EXISTS Vehicle (" +
+					"vehicle_id INTEGER PRIMARY KEY AUTOINCREMENT, make TEXT NOT NULL, model TEXT NOT NULL, " +
+					"color TEXT, year INTEGER, price REAL NOT NULL, type TEXT, handlebar_type TEXT, " +
+					"car_type TEXT, is_sold BOOLEAN DEFAULT FALSE, dealerships_id INTEGER, " +
+					"FOREIGN KEY (dealerships_id) REFERENCES dealerships(id))");
+		System.out.println("Creating the Sales table");
+		stmt.execute("CREATE TABLE IF NOT EXISTS Sales (" +
+					"sale_id INTEGER PRIMARY KEY AUTOINCREMENT, vehicle_id INTEGER NOT NULL, " +
+					"user_id INTEGER NOT NULL, buyer_name TEXT, buyer_contact TEXT, " +
+					"sale_date DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+					"FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id), " +
+					"FOREIGN KEY (user_id) REFERENCES users(user_id))");
 
 		m_connection.commit();
 
@@ -94,4 +131,11 @@ public class DBManager {
 
 		return m_dbManager;
 	}
+
+	public Connection getConnection() {
+		return m_connection;
+	}
 }
+
+
+

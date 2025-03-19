@@ -138,7 +138,7 @@ public class Frame extends JFrame implements ActionListener {
 		if (e.getSource() == m_addVehicleButton) {
 			SwingUtilities.invokeLater(() -> {
 				if (!(Main.m_dealership.isFull())) {
-					VehicleMenu VehicleMenu = new VehicleMenu();
+					VehicleMenu VehicleMenu = new VehicleMenu(Main.m_dealership);
 					VehicleMenu.setVisible(true);
 				} else
 					JOptionPane.showMessageDialog(null, "Sorry, your inventory is Full!");

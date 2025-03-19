@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 public class Sale implements Serializable {
-	private static final long serialVersionUID = -7473395562909124471L;
+	private static final long serialVersionUID = 1L;
 	private Vehicle vehicle;
 	private String buyerName;
 	private String buyerContact;

@@ -13,10 +13,12 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 public class VehicleMenu extends JFrame implements ActionListener { // this class for adding a vehicle gui..
-	private static final long serialVersionUID = 1321286967450008391L;
 	private JButton carButton, motorcycleButton, exitButton;
+	private Dealership dealership;
+	
 
-	public VehicleMenu() {
+	public VehicleMenu(Dealership dealership) {
+		this.dealership = dealership;
 		setTitle("Add a Vehicle");
 		setSize(300, 200);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -86,7 +88,7 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 
 			String type = carTypeField.getText();
 
-			if (Main.m_dealership.addVehicle(new Car(make, model, color, year, price, type)))
+			if (dealership.addVehicle(new Car(make, model, color, year, price, type)))
 				JOptionPane.showMessageDialog(null, "Car has been added successfully.");
 			else
 				JOptionPane.showMessageDialog(null, "Sorry, the car has not been added.");
@@ -134,7 +136,7 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 
 			String handlebarType = handlebarTypeField.getText();
 
-			if (Main.m_dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType)))
+			if (dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType)))
 				JOptionPane.showMessageDialog(null, "Motorcycle has been added successfully.");
 			else
 				JOptionPane.showMessageDialog(null, "Sorry, the motorcycle has not been added.");

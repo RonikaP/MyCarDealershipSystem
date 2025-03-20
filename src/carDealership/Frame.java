@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -207,7 +208,14 @@ public class Frame extends JFrame implements ActionListener {
 		if (Main.m_dealership.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Inventory is empty!");
 		} else {
-			textArea = new JTextArea(Main.m_dealership.displayAlls());
+			Vehicle[] vehicles = Main.m_dealership.getVehicles();
+			StringBuilder inventory = new StringBuilder();
+			for (Vehicle vehicle : vehicles) {
+				if (vehicle != null) {
+					inventory.append(vehicle.toString()).append("\n");
+				}
+			}
+			textArea = new JTextArea(inventory.toString());
 			textArea.setEditable(false);
 			scrollPane = new JScrollPane(textArea);
 			scrollPane.setPreferredSize(new Dimension(400, 300));
@@ -230,10 +238,14 @@ public class Frame extends JFrame implements ActionListener {
 			String buyerContact = JOptionPane.showInputDialog(null, "Enter the buyer's contact:");
 			Vehicle vehicle = Main.m_dealership.getVehicleFromId(id);
 
-			if (Main.m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-				JOptionPane.showMessageDialog(null, "Vehicle sold successfully.");
-			} else {
-				JOptionPane.showMessageDialog(null, "Couldn't sell vehicle.");
+			try {
+				if (Main.m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+					JOptionPane.showMessageDialog(null, "Vehicle sold successfully.");
+				} else {
+					JOptionPane.showMessageDialog(null, "Couldn't sell vehicle.");
+				}
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, "Error selling vehicle: " + e.getMessage());
 			}
 		} catch (NumberFormatException e) {
 			JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.");
@@ -264,10 +276,14 @@ public class Frame extends JFrame implements ActionListener {
 						"Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
 						JOptionPane.YES_NO_OPTION);
 				if (confirm == JOptionPane.YES_OPTION) {
-					if (Main.m_dealership.removeVehicle(vehicle)) {
-						JOptionPane.showMessageDialog(null, "Vehicle removed successfully.");
-					} else {
-						JOptionPane.showMessageDialog(null, "Couldn't remove vehicle.");
+					try {
+						if (Main.m_dealership.removeVehicle(vehicle)) {
+							JOptionPane.showMessageDialog(null, "Vehicle removed successfully.");
+						} else {
+							JOptionPane.showMessageDialog(null, "Couldn't remove vehicle.");
+						}
+					} catch (SQLException e) {
+						JOptionPane.showMessageDialog(null, "Error removing vehicle: " + e.getMessage());
 					}
 				}
 			}

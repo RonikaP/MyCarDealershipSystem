@@ -1032,11 +1032,16 @@ public class LoginFrame extends JFrame {
                     String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
                     String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
                     Vehicle vehicle = dealership.getVehicleFromId(id);
-                    if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-                        JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+                    try {
+                        if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+                            JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+                        }
+                    } catch (SQLException sqlException) {
+                        JOptionPane.showMessageDialog(this, "An error occurred while selling the vehicle: " + sqlException.getMessage());
                     }
+                
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
                 }
@@ -1053,10 +1058,14 @@ public class LoginFrame extends JFrame {
                                 "Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
                                 JOptionPane.YES_NO_OPTION);
                         if (confirm == JOptionPane.YES_OPTION) {
-                            if (dealership.removeVehicle(vehicle)) {
-                                JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
-                            } else {
-                                JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
+                            try {
+                                if (dealership.removeVehicle(vehicle)) {
+                                    JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
+                                } else {
+                                    JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
+                                }
+                            } catch (SQLException sqlException) {
+                                JOptionPane.showMessageDialog(this, "An error occurred while removing the vehicle: " + sqlException.getMessage());
                             }
                         }
                     }
@@ -1337,11 +1346,15 @@ public void actionPerformed(ActionEvent e) {
             String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
             String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
             Vehicle vehicle = dealership.getVehicleFromId(id);
-            if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-                JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
-                showInventory();
-            } else {
-                JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+            try {
+                if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+                    JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
+                    showInventory();
+                } else {
+                    JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "An error occurred while selling the vehicle: " + ex.getMessage());
             }
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
@@ -1359,11 +1372,14 @@ public void actionPerformed(ActionEvent e) {
                         "Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
                         JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    if (dealership.removeVehicle(vehicle)) {
-                        JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
-                        showInventory();
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
+                    try {
+                        if (dealership.removeVehicle(vehicle)) {
+                            JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
+                        }
+                    } catch (SQLException sqlException) {
+                        JOptionPane.showMessageDialog(this, "An error occurred while removing the vehicle: " + sqlException.getMessage());
                     }
                 }
             }

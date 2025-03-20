@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -88,10 +89,14 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 
 			String type = carTypeField.getText();
 
-			if (dealership.addVehicle(new Car(make, model, color, year, price, type)))
-				JOptionPane.showMessageDialog(null, "Car has been added successfully.");
-			else
-				JOptionPane.showMessageDialog(null, "Sorry, the car has not been added.");
+			try {
+				if (dealership.addVehicle(new Car(make, model, color, year, price, type)))
+					JOptionPane.showMessageDialog(null, "Car has been added successfully.");
+				else
+					JOptionPane.showMessageDialog(null, "Sorry, the car has not been added.");
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, "An error occurred while adding the car: " + e.getMessage());
+			}
 		}
 	}
 
@@ -136,10 +141,14 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 
 			String handlebarType = handlebarTypeField.getText();
 
-			if (dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType)))
-				JOptionPane.showMessageDialog(null, "Motorcycle has been added successfully.");
-			else
-				JOptionPane.showMessageDialog(null, "Sorry, the motorcycle has not been added.");
+			try {
+				if (dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType)))
+					JOptionPane.showMessageDialog(null, "Motorcycle has been added successfully.");
+				else
+					JOptionPane.showMessageDialog(null, "Sorry, the motorcycle has not been added.");
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, "An error occurred while adding the motorcycle: " + e.getMessage());
+			}
 
 		}
 	}

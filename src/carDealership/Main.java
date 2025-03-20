@@ -95,10 +95,14 @@ public class Main {
 		input.nextLine();
 		String type = input.nextLine();
 
-		if (m_dealership.addVehicle(new Car(make, model, color, year, price, type))) {
-			System.out.println("Car added succesfully.");
-		} else {
-			System.out.println("Couldn't add car.");
+		try {
+			if (m_dealership.addVehicle(new Car(make, model, color, year, price, type))) {
+				System.out.println("Car added succesfully.");
+			} else {
+				System.out.println("Couldn't add car.");
+			}
+		} catch (SQLException e) {
+			System.out.println("An error occurred while adding the car: " + e.getMessage());
 		}
 	}
 
@@ -125,10 +129,14 @@ public class Main {
 		System.out.print("Enter the handlebar type: ");
 		String handlebarType = input.nextLine();
 
-		if (m_dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType))) {
-			System.out.println("Motorcycle added successfully.");
-		} else {
-			System.out.println("Couldn't add Motorcycle.");
+		try {
+			if (m_dealership.addVehicle(new Motorcycle(make, model, color, year, price, handlebarType))) {
+				System.out.println("Motorcycle added successfully.");
+			} else {
+				System.out.println("Couldn't add Motorcycle.");
+			}
+		} catch (SQLException e) {
+			System.out.println("An error occurred while adding the motorcycle: " + e.getMessage());
 		}
 	}
 
@@ -153,10 +161,14 @@ public class Main {
 
 		Vehicle vehicle = m_dealership.getVehicleFromId(id);
 
-		if (m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-			System.out.println("Vehicle sold successfully.");
-		} else {
-			System.out.println("Couldn't sell vehicle");
+		try {
+			if (m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+				System.out.println("Vehicle sold successfully.");
+			} else {
+				System.out.println("Couldn't sell vehicle");
+			}
+		} catch (SQLException e) {
+			System.out.println("An error occurred while selling the vehicle: " + e.getMessage());
 		}
 
 	}
@@ -176,10 +188,14 @@ public class Main {
 
 		Vehicle vehicle = m_dealership.getVehicleFromId(id);
 
-		if (m_dealership.removeVehicle(vehicle)) {
-			System.out.println("Vehicle removed successfully.");
-		} else {
-			System.out.println("Couldn't remove vehicle");
+		try {
+			if (m_dealership.removeVehicle(vehicle)) {
+				System.out.println("Vehicle removed successfully.");
+			} else {
+				System.out.println("Couldn't remove vehicle");
+			}
+		} catch (SQLException e) {
+			System.out.println("An error occurred while removing the vehicle: " + e.getMessage());
 		}
 	}
 

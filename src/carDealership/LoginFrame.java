@@ -228,7 +228,7 @@ public class LoginFrame extends JFrame {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Admin");
             welcomeLabel.setBounds(20, 10, 300, 25);
             add(welcomeLabel); 
-
+        
             // Create menu bar
             menuBar = new JMenuBar();
             fileMenu = new JMenu("File");
@@ -237,19 +237,16 @@ public class LoginFrame extends JFrame {
             fileMenu.add(saveItem);
             fileMenu.add(deleteDealershipItem);
             menuBar.add(fileMenu);
-            setJMenuBar(menuBar);
-
-
+        
             // Add horizontal glue to push the logout button to the right
             menuBar.add(Box.createHorizontalGlue());
-
+        
             // Create logout button and add it to the menu bar
             JButton logoutButton = new JButton("Log Out");
             logoutButton.addActionListener(this);
             menuBar.add(logoutButton);
-
+        
             setJMenuBar(menuBar);
-
         
             // Variables to track button positions dynamically
             int xPos = 20;
@@ -258,97 +255,76 @@ public class LoginFrame extends JFrame {
             int buttonHeight = 70;
             int spacing = 160;
         
-            // Conditionally add buttons based on permissions
-            if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", true)) {
-                searchCarButton = new JButton("Search");
-                setButtonStyle(searchCarButton, "#F09EA7", xPos, yPos);
-                searchCarButton.addActionListener(this);
-                add(searchCarButton);
-                xPos += spacing;
-            }
+            // Hardcode all buttons for Admin - First row
+            searchCarButton = new JButton("Search");
+            setButtonStyle(searchCarButton, "#F09EA7", xPos, yPos);
+            searchCarButton.addActionListener(this);
+            add(searchCarButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
-                addVehicleButton = new JButton("Add Vehicle");
-                setButtonStyle(addVehicleButton, "#F6CA94", xPos, yPos);
-                addVehicleButton.addActionListener(this);
-                add(addVehicleButton);
-                xPos += spacing;
-            }
+            addVehicleButton = new JButton("Add Vehicle");
+            setButtonStyle(addVehicleButton, "#F6CA94", xPos, yPos);
+            addVehicleButton.addActionListener(this);
+            add(addVehicleButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
-                sellVehicleButton = new JButton("Sell Vehicle");
-                setButtonStyle(sellVehicleButton, "#FAFABE", xPos, yPos);
-                sellVehicleButton.setForeground(Color.GREEN);
-                sellVehicleButton.addActionListener(this);
-                add(sellVehicleButton);
-                xPos += spacing;
-            }
+            sellVehicleButton = new JButton("Sell Vehicle");
+            setButtonStyle(sellVehicleButton, "#FAFABE", xPos, yPos);
+            sellVehicleButton.setForeground(Color.GREEN);
+            sellVehicleButton.addActionListener(this);
+            add(sellVehicleButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
-                removeVehicleButton = new JButton("Remove Vehicle");
-                setButtonStyle(removeVehicleButton, "#C1EBC0", xPos, yPos);
-                removeVehicleButton.setForeground(Color.RED);
-                removeVehicleButton.addActionListener(this);
-                add(removeVehicleButton);
-                xPos += spacing;
-            }
+            removeVehicleButton = new JButton("Remove Vehicle");
+            setButtonStyle(removeVehicleButton, "#C1EBC0", xPos, yPos);
+            removeVehicleButton.setForeground(Color.RED);
+            removeVehicleButton.addActionListener(this);
+            add(removeVehicleButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("EDIT_VEHICLE", false)) {
-                editVehicleButton = new JButton("Edit Vehicle");
-                setButtonStyle(editVehicleButton, "#C7CAFF", xPos, yPos);
-                editVehicleButton.addActionListener(this);
-                add(editVehicleButton);
-                xPos += spacing;
-            }
+            editVehicleButton = new JButton("Edit Vehicle");
+            setButtonStyle(editVehicleButton, "#C7CAFF", xPos, yPos);
+            editVehicleButton.addActionListener(this);
+            add(editVehicleButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
-                salesHistoryButton = new JButton("Sales History");
-                setButtonStyle(salesHistoryButton, "#CDABEB", xPos, yPos);
-                salesHistoryButton.addActionListener(this);
-                add(salesHistoryButton);
-                xPos += spacing;
-            }
-        
+            salesHistoryButton = new JButton("Sales History");
+            setButtonStyle(salesHistoryButton, "#CDABEB", xPos, yPos);
+            salesHistoryButton.addActionListener(this);
+            add(salesHistoryButton);
+            xPos += spacing;
         
             // Reset xPos for second row
             xPos = 180;
             yPos = 120;
             buttonHeight = 50;
-    
         
-            if (user.getPermissionsMap().getOrDefault("MANAGE_USERS", false)) {
-                createProfileButton = new JButton("Create New Profile");
-                setButtonStyle(createProfileButton, "#F6CA94", xPos, yPos, 150, buttonHeight);
-                createProfileButton.addActionListener(this);
-                add(createProfileButton);
-                xPos += spacing;
-            }
+            // Hardcode additional Admin-specific buttons - Second row
+            createProfileButton = new JButton("Create New Profile");
+            setButtonStyle(createProfileButton, "#F6CA94", xPos, yPos, 150, buttonHeight);
+            createProfileButton.addActionListener(this);
+            add(createProfileButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("MANAGE_USERS", false)) {
-                employeeListButton = new JButton("Employee List");
-                setButtonStyle(employeeListButton, "#C7CAFF", xPos, yPos, 150, buttonHeight);
-                employeeListButton.addActionListener(this);
-                add(employeeListButton);
-                xPos += spacing;
-            }
+            employeeListButton = new JButton("Employee List");
+            setButtonStyle(employeeListButton, "#C7CAFF", xPos, yPos, 150, buttonHeight);
+            employeeListButton.addActionListener(this);
+            add(employeeListButton);
+            xPos += spacing;
         
-            if (user.getPermissionsMap().getOrDefault("RESET_PASSWORDS", false)) {
-                passwordManagementButton = new JButton("Password Management");
-                setButtonStyle(passwordManagementButton, "#F6C2F3", xPos, yPos, 150, buttonHeight);
-                passwordManagementButton.addActionListener(this);
-                add(passwordManagementButton);
-                xPos += spacing;
-            }
-
-            if (user.getPermissionsMap().getOrDefault("VIEW_DEALERSHIP_INFO", false)) {
-                dealershipInfoButton = new JButton("Dealership Info");
-                setButtonStyle(dealershipInfoButton, "#FFD700", xPos, yPos, 150, buttonHeight);
-                dealershipInfoButton.addActionListener(this);
-                add(dealershipInfoButton);
-                xPos += spacing;
-            }
+            passwordManagementButton = new JButton("Password Management");
+            setButtonStyle(passwordManagementButton, "#F6C2F3", xPos, yPos, 150, buttonHeight);
+            passwordManagementButton.addActionListener(this);
+            add(passwordManagementButton);
+            xPos += spacing;
         
-            // Note: saveItem and deleteDealershipItem are menu items, not buttons, so they remain in the menu bar
+            dealershipInfoButton = new JButton("Dealership Info");
+            setButtonStyle(dealershipInfoButton, "#FFD700", xPos, yPos, 150, buttonHeight);
+            dealershipInfoButton.addActionListener(this);
+            add(dealershipInfoButton);
+            xPos += spacing;
+        
+            // Add action listeners for menu items
             saveItem.addActionListener(this);
             deleteDealershipItem.addActionListener(this);
         }
@@ -1228,7 +1204,7 @@ public class LoginFrame extends JFrame {
     class SalespersonDashboard extends JFrame implements ActionListener {
         private Dealership dealership;
         private User user;
-        private JButton sellVehicleButton, searchCarButton, salesHistoryButton;
+        private JButton sellVehicleButton, searchCarButton, salesHistoryButton, addVehicleButton, removeVehicleButton;
         private JTextArea textArea;
         private JScrollPane scrollPane;
         private JMenuBar menuBar = new JMenuBar();
@@ -1239,48 +1215,48 @@ public class LoginFrame extends JFrame {
             this.user = user;
             this.dealership = dealership;
             setTitle("Salesperson Dashboard - " + dealership.getName());
-            setSize(1200, 700); // Same size as AdminDashboard and ManagerDashboard
+            setSize(1200, 700);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLayout(null);
-            getContentPane().setBackground(Color.decode("#ADD8E6")); // Same background color
+            getContentPane().setBackground(Color.decode("#ADD8E6"));
             initializeUI();
             setLocationRelativeTo(null);
         }
-
     
         private void initializeUI() {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Salesperson");
             welcomeLabel.setBounds(20, 10, 300, 25);
             add(welcomeLabel);
-
-            // Create menu bar
+    
             menuBar = new JMenuBar();
             fileMenu = new JMenu("File");
             saveItem = new JMenuItem("Save");
             fileMenu.add(saveItem);
             menuBar.add(fileMenu);
-            setJMenuBar(menuBar);
-
-
-            // Add horizontal glue to push the logout button to the right
             menuBar.add(Box.createHorizontalGlue());
-
-            // Create logout button and add it to the menu bar
             JButton logoutButton = new JButton("Log Out");
             logoutButton.addActionListener(this);
             menuBar.add(logoutButton);
-
             setJMenuBar(menuBar);
-
-        
-            // Variables to track button positions dynamically
-            int xPos = 340; // Start at a reasonable position
+    
+            int xPos = 180; // Adjusted starting position for more buttons
             int yPos = 40;
             int buttonWidth = 150;
             int buttonHeight = 70;
             int spacing = 160;
-        
-            // Conditionally add buttons based on permissions
+    
+            if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
+                addVehicleButton = new JButton("Add Vehicle");
+                addVehicleButton.setBackground(Color.decode("#F6CA94"));
+                addVehicleButton.setForeground(Color.BLACK);
+                addVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
+                addVehicleButton.setOpaque(true);
+                addVehicleButton.setBorderPainted(false);
+                addVehicleButton.addActionListener(this);
+                add(addVehicleButton);
+                xPos += spacing;
+            }
+    
             if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
                 sellVehicleButton = new JButton("Sell Vehicle");
                 sellVehicleButton.setBackground(Color.decode("#FAFABE"));
@@ -1292,7 +1268,19 @@ public class LoginFrame extends JFrame {
                 add(sellVehicleButton);
                 xPos += spacing;
             }
-        
+    
+            if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
+                removeVehicleButton = new JButton("Remove Vehicle");
+                removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
+                removeVehicleButton.setForeground(Color.RED);
+                removeVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
+                removeVehicleButton.setOpaque(true);
+                removeVehicleButton.setBorderPainted(false);
+                removeVehicleButton.addActionListener(this);
+                add(removeVehicleButton);
+                xPos += spacing;
+            }
+    
             if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", false)) {
                 searchCarButton = new JButton("Search");
                 searchCarButton.setBackground(Color.decode("#F6C2F3"));
@@ -1304,7 +1292,7 @@ public class LoginFrame extends JFrame {
                 add(searchCarButton);
                 xPos += spacing;
             }
-        
+    
             if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
                 salesHistoryButton = new JButton("Sales History");
                 salesHistoryButton.setBackground(Color.decode("#CDABEB"));
@@ -1318,80 +1306,147 @@ public class LoginFrame extends JFrame {
         }
     
         @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == sellVehicleButton) {
-                try {
-                    String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
-                    if (idString == null) return;
-                    int id = Integer.parseInt(idString);
-                    if (dealership.getIndexFromId(id) == -1) {
-                        JOptionPane.showMessageDialog(this, "Vehicle not found!");
-                        return;
+public void actionPerformed(ActionEvent e) {
+    if (e.getSource() instanceof JButton && "Log Out".equals(((JButton) e.getSource()).getText())) {
+        dispose();
+        new LoginFrame(dealership).setVisible(true);
+    } else if (e.getSource() == addVehicleButton) {
+        SwingUtilities.invokeLater(() -> {
+            if (!dealership.isFull()) {
+                VehicleMenu vehicleMenu = new VehicleMenu(dealership);
+                vehicleMenu.setVisible(true);
+                vehicleMenu.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        showInventory();
                     }
-                    String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
-                    String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
-                    Vehicle vehicle = dealership.getVehicleFromId(id);
-                    if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-                        JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
+                });
+            } else {
+                JOptionPane.showMessageDialog(this, "Sorry, your inventory is full!");
+            }
+        });
+    } else if (e.getSource() == sellVehicleButton) {
+        try {
+            String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
+            if (idString == null) return;
+            int id = Integer.parseInt(idString);
+            if (dealership.getIndexFromId(id) == -1) {
+                JOptionPane.showMessageDialog(this, "Vehicle not found!");
+                return;
+            }
+            String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
+            String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
+            Vehicle vehicle = dealership.getVehicleFromId(id);
+            if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+                JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
+                showInventory();
+            } else {
+                JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
+        }
+    } else if (e.getSource() == removeVehicleButton) {
+        try {
+            String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
+            if (idString == null) return;
+            int id = Integer.parseInt(idString);
+            if (dealership.getIndexFromId(id) == -1) {
+                JOptionPane.showMessageDialog(this, "Vehicle not found!");
+            } else {
+                Vehicle vehicle = dealership.getVehicleFromId(id);
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (dealership.removeVehicle(vehicle)) {
+                        JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
+                        showInventory();
                     } else {
-                        JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+                        JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
                     }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
                 }
-            } else if (e.getSource() == searchCarButton) {
-                String budgetText = JOptionPane.showInputDialog(this, "Enter Budget:");
-                if (budgetText == null) return;
-                try {
-                    double budget = Double.parseDouble(budgetText);
-                    if (budget < 0) {
-                        JOptionPane.showMessageDialog(this, "Invalid input. Please enter a positive number.");
-                        return;
-                    }
-                    Car[] carsWithinBudget = dealership.carsWithinBudget(budget);
-                    if (carsWithinBudget.length == 0) {
-                        JOptionPane.showMessageDialog(this, "No cars found within the budget of " + budget + " SAR.");
-                    } else {
-                        StringBuilder message = new StringBuilder();
-                        for (Car car : carsWithinBudget) {
-                            if (car != null && car.getPrice() <= budget) {
-                                message.append(car.toString()).append("\n--------------------\n");
-                            }
-                        }
-                        if (message.length() == 0) {
-                            JOptionPane.showMessageDialog(this, "No cars found within the budget of " + budget);
-                        } else {
-                            JTextArea resultArea = new JTextArea(message.toString());
-                            scrollPane = new JScrollPane(resultArea);
-                            scrollPane.setPreferredSize(new Dimension(400, 300));
-                            JOptionPane.showMessageDialog(this, scrollPane, "Cars within Budget", JOptionPane.PLAIN_MESSAGE);
-                        }
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid number.");
-                }
-            } else if (e.getSource() == salesHistoryButton) {
-                textArea = new JTextArea(dealership.showSalesHistory());
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
+        }
+    } else if (e.getSource() == searchCarButton) {
+        if (dealership.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Inventory is empty!");
+        } else {
+            JPanel filterPanel = new JPanel(new GridLayout(0, 2));
+            JTextField makeField = new JTextField();
+            JTextField modelField = new JTextField();
+            JTextField minYearField = new JTextField();
+            JTextField maxPriceField = new JTextField();
+            filterPanel.add(new JLabel("Make (optional):")); filterPanel.add(makeField);
+            filterPanel.add(new JLabel("Model (optional):")); filterPanel.add(modelField);
+            filterPanel.add(new JLabel("Min Year (optional):")); filterPanel.add(minYearField);
+            filterPanel.add(new JLabel("Max Price (optional):")); filterPanel.add(maxPriceField);
+
+            int result = JOptionPane.showConfirmDialog(this, filterPanel, "Search Inventory", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                String make = makeField.getText().trim().isEmpty() ? null : makeField.getText().trim();
+                String model = modelField.getText().trim().isEmpty() ? null : modelField.getText().trim();
+                Integer minYear = minYearField.getText().trim().isEmpty() ? null : Integer.parseInt(minYearField.getText().trim());
+                Double maxPrice = maxPriceField.getText().trim().isEmpty() ? null : Double.parseDouble(maxPriceField.getText().trim());
+
+                String filteredResult = filterInventory(make, model, minYear, maxPrice);
+                textArea = new JTextArea(filteredResult);
                 textArea.setEditable(false);
                 scrollPane = new JScrollPane(textArea);
                 scrollPane.setPreferredSize(new Dimension(400, 300));
-                JOptionPane.showMessageDialog(this, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(this, scrollPane, "Search Results", JOptionPane.PLAIN_MESSAGE);
+            }
+        }
+    } else if (e.getSource() == salesHistoryButton) {
+        textArea = new JTextArea(dealership.showSalesHistory());
+        textArea.setEditable(false);
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+        JOptionPane.showMessageDialog(this, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
+    } else if (e.getSource() == saveItem) {
+        File saveFile = new File("save.data");
+        try (FileOutputStream outFileStream = new FileOutputStream(saveFile);
+             ObjectOutputStream outObjStream = new ObjectOutputStream(outFileStream)) {
+            outObjStream.writeObject(dealership);
+            JOptionPane.showMessageDialog(this, "Dealership saved!");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error saving dealership: " + ex.getMessage());
+        }
+    }
+}
 
-            } else if (e.getSource() == saveItem) {
-                File saveFile = new File("save.data");
-                try (FileOutputStream outFileStream = new FileOutputStream(saveFile);
-                     ObjectOutputStream outObjStream = new ObjectOutputStream(outFileStream)) {
-                    outObjStream.writeObject(dealership);
-                    JOptionPane.showMessageDialog(this, "Dealership saved!");
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, "Error saving dealership: " + ex.getMessage());
+private String filterInventory(String make, String model, Integer minYear, Double maxPrice) {
+    StringBuilder result = new StringBuilder();
+    for (Vehicle vehicle : dealership.getVehicles()) {
+        if (vehicle == null) continue;
+        boolean matches = true;
+
+        if (make != null && !vehicle.getMake().equalsIgnoreCase(make)) matches = false;
+        if (model != null && !vehicle.getModel().equalsIgnoreCase(model)) matches = false;
+        if (minYear != null && vehicle.getYear() < minYear) matches = false;
+        if (maxPrice != null && vehicle.getPrice() > maxPrice) matches = false;
+
+        if (matches) {
+            result.append(vehicle.toString()).append("\n--------------------\n");
+        }
+    }
+    return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
+}
+    
+        private void showInventory() {
+            StringBuilder inventory = new StringBuilder("Current Inventory:\n");
+            for (Vehicle vehicle : dealership.getVehicles()) {
+                if (vehicle != null) {
+                    inventory.append(vehicle.toString()).append("\n--------------------\n");
                 }
             }
-
-
-
-
-            
+            textArea = new JTextArea(inventory.length() > 0 ? inventory.toString() : "Inventory is empty.");
+            textArea.setEditable(false);
+            scrollPane = new JScrollPane(textArea);
+            scrollPane.setPreferredSize(new Dimension(400, 300));
+            JOptionPane.showMessageDialog(this, scrollPane, "Current Inventory", JOptionPane.PLAIN_MESSAGE);
         }
     }
 

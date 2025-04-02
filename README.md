@@ -94,6 +94,7 @@ Below is a sample run of the program:
 - [Mohanad Hafez](https://github.com/mohanad-hafez)
 - [Faris Al Zahrani](https://github.com/nxrzs)
 - [Hisham Saydawi](https://github.com/xAGS1)
+- [Michael Persico](https://github.com/M-PERSIC)
 
 ## Possible Improvements
 

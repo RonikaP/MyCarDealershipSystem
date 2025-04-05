@@ -16,8 +16,12 @@ import javax.swing.JTextField;
 /**
  * GUI interface for adding vehicles to the dealership inventory
  *
- * @author [Your Name] [Your ID]
- * @author [Team Member Name] [Team Member ID]
+ * @author Ronika Patel (40156217)
+ * @author Nazim Chaib Cherif-Baza (40017992)
+ * @author Andrea Delgado Anderson (40315869)
+ * @author Grace Pan (40302283)
+ * @author Bao Tran Nguyen (40257379)
+ * @author Michael Persico (40090861)
  * @since 1.8
  */
 public class VehicleMenu extends JFrame implements ActionListener { // this class for adding a vehicle gui..

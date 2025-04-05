@@ -5,6 +5,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Data access layer for dealership information
+ * Manages persistence of dealership data in the database
+ *
+ * @author [Your Name] [Your ID]
+ * @author [Team Member Name] [Team Member ID]
+ * @since 1.8
+ */
 public class DealershipLayer implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String m_name;
@@ -13,10 +21,21 @@ public class DealershipLayer implements Serializable {
 
 	private int dealershipId;
 
-
+	/**
+	 * Default constructor for the DealershipLayer class
+	 */
 	public DealershipLayer() {
 	}
 
+	/**
+	 * Constructor for the DealershipLayer class
+	 * Creates a new dealership record in the database
+	 *
+	 * @param name - the name of the dealership
+	 * @param location - the location of the dealership
+	 * @param capacity - the inventory capacity of the dealership
+	 * @throws SQLException if a database access error occurs
+	 */
 	public DealershipLayer(String name, String location, int capacity) throws SQLException {
 		m_name = name;
 		m_location = location;
@@ -36,10 +55,22 @@ public class DealershipLayer implements Serializable {
         }
     }
 
+    /**
+     * Getter method for the dealership ID
+     *
+     * @return the unique identifier of the dealership in the database
+     */
     public int getDealershipId() {
         return dealershipId;
     }
 
+	/**
+	 * Check if a dealership record exists in the database
+	 * If found, sets the local attributes to match the database record
+	 *
+	 * @return true if a dealership record exists, false otherwise
+	 * @throws SQLException if a database access error occurs
+	 */
 	public boolean existsAndSet() throws SQLException {
 		var resultSet = DBManager.getInstance().runQuery("SELECT * FROM dealerships");
 		boolean dealershipFound = false;
@@ -54,16 +85,30 @@ public class DealershipLayer implements Serializable {
 		return dealershipFound;
 	}
 
+	/**
+	 * Getter method for the dealership name
+	 *
+	 * @return the name of the dealership
+	 */
 	public String getNname() {
 		return m_name;
 	}
 
+	/**
+	 * Getter method for the dealership location
+	 *
+	 * @return the location of the dealership
+	 */
 	public String getLocation() {
 		return m_location;
 	}
 
+	/**
+	 * Getter method for the dealership capacity
+	 *
+	 * @return the inventory capacity of the dealership
+	 */
 	public int getCapacity() {
 		return m_capacity;
 	}
-
 }

@@ -13,11 +13,23 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+/**
+ * GUI interface for adding vehicles to the dealership inventory
+ *
+ * @author [Your Name] [Your ID]
+ * @author [Team Member Name] [Team Member ID]
+ * @since 1.8
+ */
 public class VehicleMenu extends JFrame implements ActionListener { // this class for adding a vehicle gui..
 	private JButton carButton, motorcycleButton, exitButton;
 	private Dealership dealership;
 	
-
+	/**
+	 * Constructor for the VehicleMenu class
+	 * Creates a GUI window with buttons for adding different vehicle types
+	 *
+	 * @param dealership - the dealership instance to add vehicles to
+	 */
 	public VehicleMenu(Dealership dealership) {
 		this.dealership = dealership;
 		setTitle("Add a Vehicle");
@@ -35,9 +47,14 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		motorcycleButton.setBackground(Color.decode("#9FE7F5"));
 		motorcycleButton.addActionListener(this);
 		add(motorcycleButton);
-
 	}
 
+	/**
+	 * Handle action events from GUI components
+	 * Routes button clicks to appropriate handler methods
+	 *
+	 * @param e - the action event to be processed
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == carButton) {
 			addCarMenu();
@@ -48,6 +65,10 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		}
 	}
 
+	/**
+	 * Display a dialog for adding a car to the dealership
+	 * Collects car details from user input and adds the car to inventory
+	 */
 	private void addCarMenu() {
 		JTextField makeField = new JTextField();
 		JTextField modelField = new JTextField();
@@ -100,6 +121,10 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		}
 	}
 
+	/**
+	 * Display a dialog for adding a motorcycle to the dealership
+	 * Collects motorcycle details from user input and adds the motorcycle to inventory
+	 */
 	private void addMotorcycleMenu() {
 		JTextField makeField = new JTextField();
 		JTextField modelField = new JTextField();
@@ -149,8 +174,6 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 			} catch (SQLException e) {
 				JOptionPane.showMessageDialog(null, "An error occurred while adding the motorcycle: " + e.getMessage());
 			}
-
 		}
 	}
-
 }

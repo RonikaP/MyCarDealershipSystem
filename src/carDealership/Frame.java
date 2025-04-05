@@ -94,18 +94,26 @@ public class Frame extends JFrame implements ActionListener {
 		m_searchCarButton = new JButton("Search car (Budget)");
 		m_dealershipInfoButton = new JButton("Dealership info");
 
-		m_displayAllButton.setForeground(new java.awt.Color(12, 101, 72));
-		m_sellVehicleButton.setForeground(new java.awt.Color(1, 121, 72));
+		m_displayAllButton.setForeground(Color.decode("#E8E8E8"));
+		m_addVehicleButton.setForeground(Color.decode("#E8E8E8"));
+		m_editVehicleButton.setForeground(Color.decode("#E8E8E8"));
+		m_salesHistoryButton.setForeground(Color.decode("#E8E8E8"));
+		m_searchCarButton.setForeground(Color.decode("#E8E8E8"));
+		m_sellVehicleButton.setForeground(Color.decode("#E8E8E8"));
+		m_dealershipInfoButton.setForeground(Color.decode("#E8E8E8"));
+		
 		m_removeVehicleButton.setForeground(Color.red);
 
-		m_displayAllButton.setBackground(Color.decode("#F09EA7"));
-		m_addVehicleButton.setBackground(Color.decode("#F6CA94"));
-		m_sellVehicleButton.setBackground(Color.decode("#FAFABE"));
-		m_removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
-		m_editVehicleButton.setBackground(Color.decode("#C7CAFF"));
-		m_salesHistoryButton.setBackground(Color.decode("#CDABEB"));
-		m_searchCarButton.setBackground(Color.decode("#F6C2F3"));
-		m_dealershipInfoButton.setBackground(Color.decode("#FFD700"));
+
+		m_displayAllButton.setBackground(Color.decode("#080808"));
+		m_addVehicleButton.setBackground(Color.decode("#080808"));
+		m_sellVehicleButton.setBackground(Color.decode("#080808"));
+		m_removeVehicleButton.setBackground(Color.decode("#080808"));
+		m_editVehicleButton.setBackground(Color.decode("#080808"));
+		m_salesHistoryButton.setBackground(Color.decode("#080808"));
+		m_searchCarButton.setBackground(Color.decode("#080808"));
+		m_dealershipInfoButton.setBackground(Color.decode("#080808"));
+
 
 		m_displayAllButton.setBounds(20, 40, 150, 70);
 		m_addVehicleButton.setBounds(180, 40, 150, 70);

@@ -10,10 +10,27 @@ import persistance.DealershipLayer;
 import java.io.*;
 import java.sql.SQLException;
 
+/**
+ * Car Dealership System
+ *
+ * @author [Your Name] [Your ID]
+ * @author [Team Member Name] [Team Member ID]
+ * @since 1.8
+ */
 public class Main {
 	public static Scanner input = new Scanner(System.in);
 	public static Dealership m_dealership;
 
+	/**
+	 * Main entry point for the Car Dealership application
+	 * Initializes the dealership from saved data or creates a new one
+	 * Launches the appropriate GUI interface based on application state
+	 *
+	 * @param args - command line arguments (not used)
+	 * @throws IOException if an I/O error occurs
+	 * @throws ClassNotFoundException if the serialized class cannot be found
+	 * @throws SQLException if a database access error occurs
+	 */
 	public static void main(String args[]) throws IOException, ClassNotFoundException, SQLException {
 		try {
 			var dealershipLayer = new DealershipLayer();
@@ -48,6 +65,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Display a menu for adding vehicles to the dealership
+	 * Provides options to add either a car or motorcycle
+	 */
 	public static void addVehicleMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Add a Vehicle");
@@ -72,6 +93,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Display a menu for adding a car to the dealership
+	 * Collects car details from user input and adds the car to inventory
+	 */
 	public static void addCarMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Add a Car");
@@ -106,6 +131,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Display a menu for adding a motorcycle to the dealership
+	 * Collects motorcycle details from user input and adds it to inventory
+	 */
 	public static void addMotorcycleMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Add a Motorcycle");
@@ -140,6 +169,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Display a menu for selling a vehicle from the dealership
+	 * Collects vehicle ID and buyer information to process the sale
+	 */
 	public static void sellVehicleMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Sell a Vehicle");
@@ -170,9 +203,12 @@ public class Main {
 		} catch (SQLException e) {
 			System.out.println("An error occurred while selling the vehicle: " + e.getMessage());
 		}
-
 	}
 
+	/**
+	 * Display a menu for removing a vehicle from the dealership
+	 * Collects vehicle ID and removes the specified vehicle from inventory
+	 */
 	public static void removeVehicleMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Remove a Vehicle");
@@ -199,6 +235,10 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Display a menu for editing a vehicle in the dealership
+	 * Collects vehicle ID and redirects to appropriate edit method based on vehicle type
+	 */
 	public static void editVehicleMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Edit a Vehicle");
@@ -223,6 +263,11 @@ public class Main {
 		}
 	}
 
+	/**
+	 * Edit the details of a car vehicle
+	 * 
+	 * @param c - the car to be edited
+	 */
 	public static void carEdit(Car c) {
 		System.out.print("\nEnter the make: ");
 		String make = input.nextLine();
@@ -249,9 +294,13 @@ public class Main {
 		c.setYear(year);
 		c.setPrice(price);
 		c.setType(type);
-
 	}
 
+	/**
+	 * Edit the details of a motorcycle vehicle
+	 * 
+	 * @param m - the motorcycle to be edited
+	 */
 	public static void motorcycleEdit(Motorcycle m) {
 		System.out.print("\nEnter the make: ");
 		String make = input.nextLine();
@@ -278,9 +327,12 @@ public class Main {
 		m.setYear(year);
 		m.setPrice(price);
 		m.setHandlebarType(handlebarType);
-
 	}
 
+	/**
+	 * Display a menu for searching cars by type
+	 * Shows all cars matching the specified type
+	 */
 	public static void searchCarMenu() {
 		if (!(m_dealership.isEmpty())) {
 
@@ -303,6 +355,10 @@ public class Main {
 			System.out.println("Sorry the inventory is empty.");
 	}
 
+	/**
+	 * Display a menu for changing the console text color
+	 * Provides options for different color schemes
+	 */
 	public static void changeColorMenu() {
 		System.out.println("\n-------------------------------------------\n");
 		System.out.println("Add a Vehicle");
@@ -330,9 +386,12 @@ public class Main {
 		default:
 			System.out.println("Invalid choice. Please try again.");
 		}
-
 	}
 
+	/**
+	 * Display a menu for searching cars within a specified budget
+	 * Shows the count of cars that fall within the given price range
+	 */
 	public static void budgetCarMenu() {
 		if (!(m_dealership.isEmpty())) {
 
@@ -354,6 +413,15 @@ public class Main {
 			System.out.println("Sorry the inventory is empty.");
 	}
 
+	/**
+	 * Create a new dealership with the specified attributes
+	 * 
+	 * @param name - the name of the dealership
+	 * @param location - the location of the dealership
+	 * @param capacity - the inventory capacity of the dealership
+	 * @throws IllegalCapacityException if the capacity is not within valid range (1-100)
+	 * @throws SQLException if a database access error occurs
+	 */
 	public static void createDealership(String name, String location, int capacity)
 			throws IllegalCapacityException, SQLException {
 		if (capacity < 1 || capacity > 100) {
@@ -362,6 +430,12 @@ public class Main {
 		m_dealership = new Dealership(name, location, capacity);
 	}
 
+	/**
+	 * Save the current dealership state to a file
+	 * Persists the dealership object to save.data file
+	 * 
+	 * @throws IOException if an I/O error occurs during saving
+	 */
 	public static void save() throws IOException {
 		File saveFile = new File("save.data");
 		FileOutputStream outFileStream = null;
@@ -381,6 +455,5 @@ public class Main {
 
 		outObjStream.writeObject(m_dealership);
 		outObjStream.close();
-
 	}
 }

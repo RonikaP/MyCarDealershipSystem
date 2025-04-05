@@ -47,7 +47,7 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		carButton.setForeground(Color.decode("#E8E8E8"));
 		carButton.addActionListener(this);
 		add(carButton);
-
+//
 		motorcycleButton = new JButton("Add Motorcycle");
 		motorcycleButton.setBackground(Color.decode("#080808"));
 		motorcycleButton.setForeground(Color.decode("#E8E8E8"));

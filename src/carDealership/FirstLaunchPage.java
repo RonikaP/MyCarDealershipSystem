@@ -14,6 +14,13 @@ import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 import java.awt.Toolkit;
 
+/**
+ * Launch Page Class
+ *
+ * @author [Your Name] [Your ID]
+ * @author [Team Member Name] [Team Member ID]
+ * @since 1.8
+ */
 public class FirstLaunchPage extends JFrame {
 
 	private static final long serialVersionUID = 1L;
@@ -23,7 +30,9 @@ public class FirstLaunchPage extends JFrame {
 	private JTextField textField_2;
 
 	/**
-	 * Create the frame.
+	 * Constructor for the FirstLaunchPage class
+	 * Creates and initializes the first launch frame for the dealership setup
+	 * This frame collects dealership name, location, and inventory capacity
 	 */
 	public FirstLaunchPage() {
 		setIconImage(Toolkit.getDefaultToolkit().getImage(FirstLaunchPage.class.getResource("/images/icon.jpg")));
@@ -102,6 +111,11 @@ public class FirstLaunchPage extends JFrame {
 		contentPane.add(lblNewLabel_4);
 		lblNewLabel_4.setVisible(false);
 
+		/**
+		 * Mouse event handler for the Go button
+		 * Creates a dealership with the entered information when the button is clicked
+		 * Displays appropriate error messages for invalid inputs
+		 */
 		btnNewButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseReleased(MouseEvent e) {

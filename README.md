@@ -91,10 +91,14 @@ Below is a sample run of the program:
 
 ## Team Members
 
+
+- [Michael Persico](https://github.com/M-PERSIC)
+
+
+Based on the work of previous members:
 - [Mohanad Hafez](https://github.com/mohanad-hafez)
 - [Faris Al Zahrani](https://github.com/nxrzs)
 - [Hisham Saydawi](https://github.com/xAGS1)
-- [Michael Persico](https://github.com/M-PERSIC)
 
 ## Possible Improvements
 

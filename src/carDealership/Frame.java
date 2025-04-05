@@ -23,25 +23,47 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
+/**
+ * Car Dealership System
+ *
+ * @author [Your Name] [Your ID]
+ * @author [Team Member Name] [Team Member ID]
+ * @since 1.8
+ */
 public class Frame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -4235592661347719465L;
 	private JFrame jf1;
-	// ---------Buttons--------
+	
+	/**
+	 * Main GUI buttons for the dealership system operations
+	 */
 	private JButton m_displayAllButton, m_addVehicleButton, m_sellVehicleButton, m_removeVehicleButton,
 			m_editVehicleButton, m_salesHistoryButton, m_searchCarButton, m_dealershipInfoButton;
 
-	// =========Files==========
+	/**
+	 * Components for displaying text content
+	 */
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
-	// ---------JMenu -----------------
+	
+	/**
+	 * Menu components for file operations
+	 */
 	private JMenuBar menuBar;
 	private JMenu fileMenu;
 	private JMenuItem save;
 	private JMenuItem deleteDealership;
 
-	// -----------Labels---------
+	/**
+	 * Labels for the GUI
+	 */
 	private JLabel jl1;
 
+	/**
+	 * Constructor for the Frame class
+	 * Creates the main GUI window for interacting with the dealership system
+	 * Initializes all UI components and registers action listeners
+	 */
 	public Frame() {
 		jf1 = new JFrame();
 
@@ -132,6 +154,12 @@ public class Frame extends JFrame implements ActionListener {
 		deleteDealership.addActionListener(this);
 	}
 
+	/**
+	 * Handle action events from GUI components
+	 * Routes button clicks to appropriate handler methods
+	 *
+	 * @param e - the action event to be processed
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == m_displayAllButton) {
 			displayInventory();
@@ -191,6 +219,10 @@ public class Frame extends JFrame implements ActionListener {
 
 	}
 
+	/**
+	 * Display dealership information in a dialog
+	 * Shows details about the dealership such as name, location, and inventory statistics
+	 */
 	private void displayDealerInfo() {
 		JTextArea textArea = new JTextArea();
 		textArea.setText(Main.m_dealership.getInfoGUI());
@@ -204,6 +236,10 @@ public class Frame extends JFrame implements ActionListener {
 
 	}
 
+	/**
+	 * Display all vehicles in the inventory
+	 * Shows a dialog with information about all vehicles currently in stock
+	 */
 	private void displayInventory() {
 		if (Main.m_dealership.isEmpty()) {
 			JOptionPane.showMessageDialog(null, "Inventory is empty!");
@@ -223,6 +259,10 @@ public class Frame extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Display interface for selling a vehicle
+	 * Collects vehicle ID, buyer information, and processes the sale
+	 */
 	private void sellVehicleMenu() {
 		try {
 			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
@@ -252,6 +292,10 @@ public class Frame extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Display the dealership's sales history
+	 * Shows a dialog with information about all past sales
+	 */
 	private void displaySalesHistory() {
 		textArea = new JTextArea(Main.m_dealership.showSalesHistory());
 		textArea.setEditable(false);
@@ -260,6 +304,10 @@ public class Frame extends JFrame implements ActionListener {
 		JOptionPane.showMessageDialog(null, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
 	}
 
+	/**
+	 * Display interface for removing a vehicle from inventory
+	 * Collects vehicle ID and confirms removal with the user
+	 */
 	private void removeVehicleMenu() {
 		try {
 			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
@@ -292,6 +340,10 @@ public class Frame extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Display interface for editing vehicle details
+	 * Allows modification of various attributes of a vehicle
+	 */
 	private void editVehicleMenu() {
 		try {
 			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
@@ -400,6 +452,10 @@ public class Frame extends JFrame implements ActionListener {
 		}
 	}
 
+	/**
+	 * Display interface for searching cars within a budget
+	 * Collects budget limit from user and displays matching vehicles
+	 */
 	public void budgetCarGUI() { // Search a CAR WITHIN a specific BUDGET.
 
 		String budgetText = JOptionPane.showInputDialog(null, "Enter Budget:");
@@ -438,5 +494,4 @@ public class Frame extends JFrame implements ActionListener {
 			JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number.");
 		}
 	}
-
 }

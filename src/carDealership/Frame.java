@@ -84,7 +84,7 @@ public class Frame extends JFrame implements ActionListener {
 
 		jf1.setJMenuBar(menuBar);
 
-		// ----------jbuttons stuff-------------
+		// ----------jbuttons stuff------------- //
 		m_displayAllButton = new JButton("Display all");
 		m_addVehicleButton = new JButton("Add a vehicle");
 		m_sellVehicleButton = new JButton("Sell a vehicle");

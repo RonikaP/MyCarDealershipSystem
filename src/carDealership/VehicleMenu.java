@@ -33,7 +33,7 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 	 * Creates a GUI window with buttons for adding different vehicle types
 	 *
 	 * @param dealership - the dealership instance to add vehicles to
-	 */
+	 *//
 	public VehicleMenu(Dealership dealership) {
 		this.dealership = dealership;
 		setTitle("Add a Vehicle");
@@ -47,7 +47,7 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		carButton.setForeground(Color.decode("#E8E8E8"));
 		carButton.addActionListener(this);
 		add(carButton);
-//
+
 		motorcycleButton = new JButton("Add Motorcycle");
 		motorcycleButton.setBackground(Color.decode("#080808"));
 		motorcycleButton.setForeground(Color.decode("#E8E8E8"));

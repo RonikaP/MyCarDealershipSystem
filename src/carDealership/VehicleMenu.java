@@ -41,14 +41,24 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLayout(new GridLayout(2, 1));
 		setLocationRelativeTo(null);
+		
+		// Load and scale icons
+		ImageIcon carIcon = new ImageIcon("src/images/auto.png");
+		ImageIcon motoIcon = new ImageIcon("src/images/moto.png");
 
-		carButton = new JButton("Add Car");
+		Image carImg = carIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+		ImageIcon scaledCarIcon = new ImageIcon(carImg);
+
+		Image motoImg = motoIcon.getImage().getScaledInstance(20, 20, Image.SCALE_SMOOTH);
+		ImageIcon scaledMotoIcon = new ImageIcon(motoImg);
+
+		carButton = new JButton("Add Car", scaledCarIcon);
 		carButton.setBackground(Color.decode("#080808"));
 		carButton.setForeground(Color.decode("#E8E8E8"));
 		carButton.addActionListener(this);
 		add(carButton);
 
-		motorcycleButton = new JButton("Add Motorcycle");
+		motorcycleButton = new JButton("Add Motorcycle", scaledMotoIcon);
 		motorcycleButton.setBackground(Color.decode("#080808"));
 		motorcycleButton.setForeground(Color.decode("#E8E8E8"));
 		motorcycleButton.addActionListener(this);

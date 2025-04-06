@@ -83,25 +83,63 @@ public class Frame extends JFrame implements ActionListener {
 		menuBar.add(fileMenu);
 
 		jf1.setJMenuBar(menuBar);
+		
+		// Load and scale icons
+		ImageIcon addIcon = new ImageIcon("src/images/add.png");
+		ImageIcon deleteIcon = new ImageIcon("src/images/delete.png");
+		ImageIcon editIcon = new ImageIcon("src/images/edit.png");
+		ImageIcon historyIcon = new ImageIcon("src/images/history.png");
+		ImageIcon infoIcon = new ImageIcon("src/images/info.png");
+		ImageIcon searchIcon = new ImageIcon("src/images/search.png");
+		ImageIcon sellIcon = new ImageIcon("src/images/sell.png");
+		ImageIcon displayallIcon = new ImageIcon("src/images/displayall.png");
+		
+		Image addImg = addIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledAddIcon = new ImageIcon(addImg);
+
+		Image deleteImg = deleteIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledDeleteIcon = new ImageIcon(deleteImg);
+		
+
+		Image editImg = editIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledEditIcon = new ImageIcon(editImg);
+
+		Image historyImg = historyIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledHistoryIcon = new ImageIcon(historyImg);
+		
+		Image infoImg = infoIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledInfoIcon = new ImageIcon(infoImg);
+
+		Image searchImg = searchIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledSearchIcon = new ImageIcon(searchImg);
+		
+		Image sellImg = sellIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledSellIcon = new ImageIcon(sellImg);
+
+		Image displayallImg = displayallIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+		ImageIcon scaledDisplayallIcon = new ImageIcon(displayallImg);
+		
 
 		// ----------jbuttons stuff------------- //
-		m_displayAllButton = new JButton("Display all");
-		m_addVehicleButton = new JButton("Add a vehicle");
-		m_sellVehicleButton = new JButton("Sell a vehicle");
-		m_removeVehicleButton = new JButton("Remove a vehicle");
-		m_editVehicleButton = new JButton("Edit a vehicle");
-		m_salesHistoryButton = new JButton("Sales history");
-		m_searchCarButton = new JButton("Search car (Budget)");
-		m_dealershipInfoButton = new JButton("Dealership info");
+		m_displayAllButton = new JButton("Display all", scaledDisplayallIcon);
+		m_searchCarButton = new JButton("Search car (Budget)", scaledSearchIcon);
+		m_sellVehicleButton = new JButton("Sell a vehicle", scaledSellIcon);
+		
+		m_addVehicleButton = new JButton("Add a vehicle", scaledAddIcon);
+		m_removeVehicleButton = new JButton("Remove a vehicle", scaledDeleteIcon);
+		m_editVehicleButton = new JButton("Edit a vehicle", scaledEditIcon);
+		
+		m_dealershipInfoButton = new JButton("Dealership info", scaledInfoIcon);
+		m_salesHistoryButton = new JButton("Sales history", scaledHistoryIcon);
 
+		
 		m_displayAllButton.setForeground(Color.decode("#E8E8E8"));
-		m_addVehicleButton.setForeground(Color.decode("#E8E8E8"));
+		m_addVehicleButton.setForeground(Color.decode("#92D050"));
 		m_editVehicleButton.setForeground(Color.decode("#E8E8E8"));
 		m_salesHistoryButton.setForeground(Color.decode("#E8E8E8"));
 		m_searchCarButton.setForeground(Color.decode("#E8E8E8"));
 		m_sellVehicleButton.setForeground(Color.decode("#E8E8E8"));
 		m_dealershipInfoButton.setForeground(Color.decode("#E8E8E8"));
-		
 		m_removeVehicleButton.setForeground(Color.red);
 
 
@@ -114,16 +152,19 @@ public class Frame extends JFrame implements ActionListener {
 		m_searchCarButton.setBackground(Color.decode("#080808"));
 		m_dealershipInfoButton.setBackground(Color.decode("#080808"));
 
+		m_displayAllButton.setBounds(300, 150, 250, 70);
+		m_searchCarButton.setBounds(300, 230, 250, 70);
+		m_sellVehicleButton.setBounds(300, 310, 250, 70);
 
-		m_displayAllButton.setBounds(20, 40, 150, 70);
-		m_addVehicleButton.setBounds(180, 40, 150, 70);
-		m_sellVehicleButton.setBounds(340, 40, 150, 70);
-		m_removeVehicleButton.setBounds(500, 40, 150, 70);
-		m_editVehicleButton.setBounds(660, 40, 150, 70);
-		m_salesHistoryButton.setBounds(820, 40, 150, 70);
-		m_searchCarButton.setBounds(980, 40, 150, 70);
-
-		m_dealershipInfoButton.setBounds(500, 120, 150, 50);
+		
+		m_addVehicleButton.setBounds(600, 150, 250, 70);
+		m_removeVehicleButton.setBounds(600, 230, 250, 70);
+		m_editVehicleButton.setBounds(600, 310, 250, 70);
+		
+		
+		m_dealershipInfoButton.setBounds(1000, 2, 140, 25);
+		m_salesHistoryButton.setBounds(1000, 30, 140, 25);
+		
 
 		// ------------Labels-----------
 		jl1 = new JLabel("");
@@ -134,7 +175,7 @@ public class Frame extends JFrame implements ActionListener {
 
 		jf1.setTitle("Dealership system");
 		jf1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		jf1.getContentPane().setBackground(Color.decode("#ADD8E6"));
+		jf1.getContentPane().setBackground(Color.decode("#0E2841"));
 
 		jf1.setVisible(true);
 		jf1.setBounds(0, 0, 1170, 600);
@@ -213,7 +254,7 @@ public class Frame extends JFrame implements ActionListener {
 		}
 
 		if (e.getSource() == deleteDealership) {
-			int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete the dealership?",
+			int confirm = JOptionPane.showConfirmDialog(null, "⚠️ Are you sure you want to delete the dealership?",
 					"Confirmation", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
 				System.out.println("On bro I'm speaking fax");
@@ -277,30 +318,30 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void sellVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, " 🔍 Enter the id of the vehicle:");
 			if (idString == null) { // checks if no input
 				return;
 			}
 			int id = Integer.parseInt(idString);
 			if (Main.m_dealership.getIndexFromId(id) == -1) {
-				JOptionPane.showMessageDialog(null, "Vehicle not found!");
+				JOptionPane.showMessageDialog(null, "❌ Vehicle not found!");
 				return;
 			}
-			String buyerName = JOptionPane.showInputDialog(null, "Enter the buyer's name:");
-			String buyerContact = JOptionPane.showInputDialog(null, "Enter the buyer's contact:");
+			String buyerName = JOptionPane.showInputDialog(null, "👤 Enter the buyer's name:");
+			String buyerContact = JOptionPane.showInputDialog(null, "📞 Enter the buyer's contact:");
 			Vehicle vehicle = Main.m_dealership.getVehicleFromId(id);
 
 			try {
 				if (Main.m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-					JOptionPane.showMessageDialog(null, "Vehicle sold successfully.");
+					JOptionPane.showMessageDialog(null, "✅ Vehicle sold successfully.");
 				} else {
-					JOptionPane.showMessageDialog(null, "Couldn't sell vehicle.");
+					JOptionPane.showMessageDialog(null, "❌ Couldn't sell vehicle.");
 				}
 			} catch (SQLException e) {
 				JOptionPane.showMessageDialog(null, "Error selling vehicle: " + e.getMessage());
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.");
+			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid integer.");
 		}
 	}
 
@@ -322,7 +363,7 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void removeVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, "🔍 Enter the id of the vehicle:");
 			if (idString == null) { // checks if no input
 				return;
 			}
@@ -338,17 +379,17 @@ public class Frame extends JFrame implements ActionListener {
 				if (confirm == JOptionPane.YES_OPTION) {
 					try {
 						if (Main.m_dealership.removeVehicle(vehicle)) {
-							JOptionPane.showMessageDialog(null, "Vehicle removed successfully.");
+							JOptionPane.showMessageDialog(null, "✅ Vehicle removed successfully.");
 						} else {
-							JOptionPane.showMessageDialog(null, "Couldn't remove vehicle.");
+							JOptionPane.showMessageDialog(null, "❌ Couldn't remove vehicle.");
 						}
 					} catch (SQLException e) {
-						JOptionPane.showMessageDialog(null, "Error removing vehicle: " + e.getMessage());
+						JOptionPane.showMessageDialog(null, "⚠️ Error removing vehicle: " + e.getMessage());
 					}
 				}
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid integer.");
+			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid integer.");
 		}
 	}
 
@@ -358,7 +399,7 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void editVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, "Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, "🔍 Enter the id of the vehicle:");
 
 			if (idString == null) { // checks if no input
 				return;
@@ -367,7 +408,7 @@ public class Frame extends JFrame implements ActionListener {
 			int id = Integer.parseInt(idString);
 
 			if (Main.m_dealership.getIndexFromId(id) == -1) { // check if exist
-				JOptionPane.showMessageDialog(null, "Vehicle not found!");
+				JOptionPane.showMessageDialog(null, "❌ Vehicle not found!");
 				return;
 			}
 			Vehicle vehicle = Main.m_dealership.getVehicleFromId(id);
@@ -457,10 +498,10 @@ public class Frame extends JFrame implements ActionListener {
 					motorcycle.setPrice(Double.parseDouble(priceField.getText()));
 					motorcycle.setHandlebarType(handlebarField.getText());
 				}
-				JOptionPane.showMessageDialog(null, "Vehicle edited successfully.");
+				JOptionPane.showMessageDialog(null, "✅ Vehicle edited successfully.");
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "Invalid input. Year and price must be numeric values.");
+			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Year and price must be numeric values.");
 		}
 	}
 
@@ -479,7 +520,7 @@ public class Frame extends JFrame implements ActionListener {
 
 			double budget = Double.parseDouble(budgetText);
 			if (budget < 0) {
-				JOptionPane.showMessageDialog(null, "Invalid input. Please enter a positive number.");
+				JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a positive number.");
 				return;
 			}
 
@@ -503,7 +544,7 @@ public class Frame extends JFrame implements ActionListener {
 				}
 			}
 		} catch (NumberFormatException ex) {
-			JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid number.");
+			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid number.");
 		}
 	}
 }

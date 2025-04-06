@@ -47,7 +47,7 @@ public class DealershipLayer implements Serializable {
 		this.dealershipId = 1;
 
 		String query = "INSERT INTO dealerships (name, location, capacity) VALUES (?, ?, ?)";
-        PreparedStatement statement = DBManager.getInstance().getConnection().prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
+        PreparedStatement statement = DBManager.getInstance().Connection().prepareStatement(query, java.sql.Statement.RETURN_GENERATED_KEYS);
         statement.setString(1, name);
         statement.setString(2, location);
         statement.setInt(3, capacity);

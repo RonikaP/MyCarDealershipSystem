@@ -339,12 +339,16 @@ class Admin extends User {
      * @return true if the password was successfully reset, false otherwise
      * @throws Exception if a database error occurs
      */
-    public boolean resetPassword(User user, String newPassword) throws Exception {
-        if (user != null && user.isActive()) {
-            user.setPassword(newPassword);
+    public boolean resetPassword(User var1, String var2) throws Exception {
+        if (var1 != null && var1.isActive()) {
+            var1.setPassword(var2); // Set the new password in the User object
+            DBManager db = DBManager.getInstance();
+            String query = "UPDATE users SET password = '" + var2 + "', is_temp_password = 1 WHERE user_id = " + var1.getId();
+            db.runUpdate(query); // Execute the update query
             return true;
+        } else {
+            return false;
         }
-        return false;
     }
 }
 

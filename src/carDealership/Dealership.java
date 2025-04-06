@@ -5,9 +5,11 @@ import persistance.DealershipLayer;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -382,20 +384,41 @@ public class Dealership implements Serializable {
         db.runUpdate(query, user.password, user.name, user.email, user.phone, user.isActive ? 1 : 0, user.getId());
     }
 
+    public void addPasswordResetRequest(User user) throws SQLException {
+                DBManager db = DBManager.getInstance();
+                db.runInsert("INSERT INTO password_reset_requests (username, request_date) VALUES (?, ?)",
+                            user.getUsername(), LocalDateTime.now().toString());
+            }
+
     /**
      * Retrieve users who have requested a password reset
      *
      * @return list of users with password reset requests
      * @throws SQLException if a database access error occurs
      */
-    public List<User> getPasswordResetRequests() throws SQLException {
-        List<User> requests = new ArrayList<>();
-        List<User> allUsers = getUsers();
-        for (User u : allUsers) {
-            if (u.getUsername().startsWith("sales")) { // Arbitrary condition as in original
-                requests.add(u);
-            }
-        }
-        return requests;
-    }
+    public List<User> getPasswordResetRequests() throws SQLException, Exception {
+			DBManager db = DBManager.getInstance();
+			List<User> requests = new ArrayList<>();
+			PreparedStatement stmt = null;
+			ResultSet rs = null;
+			try {
+				stmt = db.Connection().prepareStatement("SELECT username FROM password_reset_requests");
+				rs = stmt.executeQuery();
+				while (rs.next()) {
+					String username = rs.getString("username");
+					User user = User.loadUser(username);
+					if (user != null) {
+						requests.add(user);
+					}
+				}
+			} finally {
+				if (rs != null) {
+					rs.close();
+				}
+				if (stmt != null) {
+					stmt.close();
+				}
+			}
+			return requests;
+		}
 }

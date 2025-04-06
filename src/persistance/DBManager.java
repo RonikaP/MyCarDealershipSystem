@@ -21,7 +21,6 @@ import java.sql.SQLException;
 public class DBManager {
 
 	private static DBManager m_dbManager;
-
 	private String m_dbPath;
 	private Connection m_connection;
 
@@ -167,7 +166,11 @@ public class DBManager {
 					"sale_date DATETIME DEFAULT CURRENT_TIMESTAMP, " +
 					"FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id), " +
 					"FOREIGN KEY (user_id) REFERENCES users(user_id))");
-
+		System.out.println("Creating the password_reset_requests table");
+		stmt.execute("CREATE TABLE IF NOT EXISTS password_reset_requests (" +
+					"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+					"username TEXT NOT NULL, " +
+					"request_date TEXT NOT NULL)");	
 		m_connection.commit();
 	}
 
@@ -182,7 +185,6 @@ public class DBManager {
 		if (m_dbManager == null) {
 			m_dbManager = new DBManager();
 		}
-
 		return m_dbManager;
 	}
 
@@ -191,7 +193,7 @@ public class DBManager {
 	 *
 	 * @return the Connection object for the database
 	 */
-	public Connection getConnection() {
+	public Connection Connection() throws SQLException {
 		return m_connection;
 	}
 }

@@ -260,7 +260,7 @@ public class Frame extends JFrame implements ActionListener {
 			int confirm = JOptionPane.showConfirmDialog(null, "⚠️ Are you sure you want to delete the dealership?",
 					"Confirmation", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
-				System.out.println("On bro I'm speaking fax");
+				System.out.println("Dealership was successfully deleted");
 				File saveFile = new File("save.data");
 				if (saveFile.exists()) {
 					saveFile.delete();

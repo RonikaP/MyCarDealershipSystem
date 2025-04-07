@@ -18,17 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
 
-/**
- * Car Dealership System
- *
- * @author Ronika Patel (40156217)
- * @author Nazim Chaib Cherif-Baza (40017992)
- * @author Andrea Delgado Anderson (40315869)
- * @author Grace Pan (40302283)
- * @author Bao Tran Nguyen (40257379)
- * @author Michael Persico (40090861)
- * @since 1.8
- */
+
 public class LoginFrame extends JFrame {
     private static final long serialVersionUID = 1L;
     private JTextField usernameField;
@@ -36,24 +26,12 @@ public class LoginFrame extends JFrame {
     private JButton loginButton;
     private JLabel statusLabel;
     private Dealership dealership;
-    private JButton forgotPasswordButton;
 
-
-    /**
-     * Constructor for the LoginFrame class
-     * Creates the login interface for user authentication
-     *
-     * @param dealership - the dealership instance to be managed after login
-     */
     public LoginFrame(Dealership dealership) {
         this.dealership = dealership;
         initializeUI();
     }
 
-    /**
-     * Initialize the login UI components
-     * Sets up labels, text fields, and button for the login form
-     */
     private void initializeUI() {
         setTitle("Dealership System - Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -80,117 +58,50 @@ public class LoginFrame extends JFrame {
         loginButton.setBounds(300, 200, 100, 30);
         add(loginButton);
 
-         // 🔹 Forgot Password Button
-        JButton forgotPasswordButton = new JButton("Forgot Password?");
-        forgotPasswordButton.setBounds(80, 240, 150, 30); // Adjust position
-        add(forgotPasswordButton);
-
         statusLabel = new JLabel("");
         statusLabel.setBounds(200, 250, 250, 25);
         add(statusLabel);
 
         loginButton.addActionListener(e -> authenticateUser());
 
-        // 🔹 Add action listener for forgot password
-        forgotPasswordButton.addActionListener(e -> handleForgotPassword());
-
         setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    private void handleForgotPassword() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.add(new JLabel("Did you forget your password? Send a request to the admin."));
-        panel.add(new JLabel("Enter your username:"));
-    
-        // Add a smaller text field for username input
-        JTextField usernameInput = new JTextField();
-        usernameInput.setPreferredSize(new Dimension(100, 25)); // Smaller square field
-        panel.add(usernameInput);
-    
-        int choice = JOptionPane.showOptionDialog(this,
-            panel,
-            "Forgot Password",
-            JOptionPane.OK_CANCEL_OPTION,
-            JOptionPane.QUESTION_MESSAGE,
-            null,
-            null,
-            null);
-    
-        if (choice == JOptionPane.OK_OPTION) {
-            String username = usernameInput.getText().trim();
-            if (!username.isEmpty()) {
-                try {
-                    User user = User.loadUser(username);
-                    if (user != null) {
-                        if (user.isActive()) {
-                            dealership.addPasswordResetRequest(user);
-                            JOptionPane.showMessageDialog(this, "Password reset request sent to admin.");
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Your account is inactive. Please contact an administrator.");
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(this, "User not found.");
-                    }
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(this, "A database error occurred: " + e.getMessage());
-                } catch (Exception e) {
-                    JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
-                }
-            } else {
-                JOptionPane.showMessageDialog(this, "Username cannot be empty!");
-            }
-        }
-    }
 
-    /**
-     * Load user data from the database
-     *
-     * @param username - the username to search for
-     * @return the User object if found, null otherwise
-     * @throws SQLException if a database access error occurs
-     * @throws Exception for other errors
-     */
     public static User loadUser(String username) throws SQLException, Exception {
-        DBManager db = DBManager.getInstance();
-        ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
+    DBManager db = DBManager.getInstance();
+    ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
                                "ON u.role_id = r.role_id WHERE u.username = '" + username + "'");
-        if (rs.next()) {
-            String role = rs.getString("role_name");
-            String password = rs.getString("password");
-            boolean isTempPassword = rs.getInt("is_temp_password") == 1;
-            int rawIsActive = rs.getInt("is_active"); // Get raw value
-            boolean isActive = rawIsActive == 1;
-            System.out.println("Raw is_active from DB for " + username + ": " + rawIsActive);
-            System.out.println("Computed isActive: " + isActive);
+    if (rs.next()) {
+        String role = rs.getString("role_name");
+        String password = rs.getString("password");
+        boolean isTempPassword = rs.getInt("is_temp_password") == 1;
+        int rawIsActive = rs.getInt("is_active"); // Get raw value
+        boolean isActive = rawIsActive == 1;
+        System.out.println("Raw is_active from DB for " + username + ": " + rawIsActive);
+        System.out.println("Computed isActive: " + isActive);
 
-            switch (role) {
-                case "Admin":
-                    return new Admin(rs.getInt("user_id"), rs.getString("username"), password,
+        switch (role) {
+            case "Admin":
+                return new Admin(rs.getInt("user_id"), rs.getString("username"), password,
                                  rs.getString("name"), rs.getString("email"), rs.getString("phone"),
                                  isTempPassword, isActive);
-                case "Manager":
-                    return new Manager(rs.getInt("user_id"), rs.getString("username"), password,
+            case "Manager":
+                return new Manager(rs.getInt("user_id"), rs.getString("username"), password,
                                    rs.getString("name"), rs.getString("email"), rs.getString("phone"),
                                    isTempPassword, isActive);
-                case "Salesperson":
-                    return new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
+            case "Salesperson":
+                return new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
                                        rs.getString("name"), rs.getString("email"), rs.getString("phone"),
                                        isTempPassword, isActive);
-                default:
-                    throw new SQLException("Unknown role: " + role);
-            }
+            default:
+                throw new SQLException("Unknown role: " + role);
         }
-        return null;
     }
+    return null;
+}
 
-    /**
-     * Display dialog for changing a temporary password
-     * Forces the user to create a new password during first login
-     *
-     * @param user - the user whose password needs to be changed
-     */
     private void forcePasswordChange(User user) {
         JPanel panel = new JPanel(new GridLayout(2, 2));
         JLabel newPassLabel = new JLabel("New Password:");
@@ -238,10 +149,6 @@ public class LoginFrame extends JFrame {
         }
     }
 
-    /**
-     * Authenticate the user based on provided credentials
-     * Handles temporary password changes and redirects to appropriate dashboards
-     */
     private void authenticateUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
@@ -272,22 +179,11 @@ public class LoginFrame extends JFrame {
             System.out.println("An error occurred: " + e.getMessage());
         }
     }
-
-    /**
-     * Handle successful login process
-     * 
-     * @param user - the authenticated user
-     */
     private void loginSuccessful(User user) {
         dispose(); // Close the login frame
         openDashboard(user);
     }
     
-    /**
-     * Open the appropriate dashboard based on user role
-     * 
-     * @param user - the authenticated user
-     */
     private void openDashboard(User user) {
         dispose();
         SwingUtilities.invokeLater(() -> {
@@ -301,10 +197,7 @@ public class LoginFrame extends JFrame {
         });
     }
 
-    /**
-     * Dashboard interface for administrators with full system access
-     * Provides vehicle management, user management, and system configuration
-     */
+    // Dashboard views by Role
     class AdminDashboard extends JFrame implements ActionListener {
         private Dealership dealership;
         private User user;
@@ -318,12 +211,7 @@ public class LoginFrame extends JFrame {
         private JMenuItem saveItem, deleteDealershipItem;
         private JButton logoutButton = new JButton("Logout");
         
-        /**
-         * Constructor for the AdminDashboard class
-         *
-         * @param user - the authenticated admin user
-         * @param dealership - the dealership instance to manage
-         */
+    
         public AdminDashboard(User user, Dealership dealership) {
             this.user = user;
             this.dealership = dealership;
@@ -336,10 +224,6 @@ public class LoginFrame extends JFrame {
             setLocationRelativeTo(null);
         }
     
-        /**
-         * Initialize the admin dashboard UI components
-         * Sets up buttons and menu items for all administrative functions
-         */
         private void initializeUI() {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Admin");
             welcomeLabel.setBounds(20, 10, 300, 25);
@@ -356,10 +240,12 @@ public class LoginFrame extends JFrame {
         
             // Add horizontal glue to push the logout button to the right
             menuBar.add(Box.createHorizontalGlue());
+        
             // Create logout button and add it to the menu bar
             JButton logoutButton = new JButton("Log Out");
-            logoutButton.addActionListener(e -> handleLogout());
+            logoutButton.addActionListener(this);
             menuBar.add(logoutButton);
+        
             setJMenuBar(menuBar);
         
             // Variables to track button positions dynamically
@@ -443,11 +329,6 @@ public class LoginFrame extends JFrame {
             deleteDealershipItem.addActionListener(this);
         }
     
-        /**
-         * Handle action events from admin dashboard components
-         *
-         * @param e - the action event to be processed
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
@@ -657,15 +538,6 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        /**
-         * Filter inventory based on search criteria
-         *
-         * @param make - the vehicle make to filter by (optional)
-         * @param model - the vehicle model to filter by (optional)
-         * @param minYear - the minimum vehicle year to filter by (optional)
-         * @param maxPrice - the maximum vehicle price to filter by (optional)
-         * @return formatted string of vehicles matching the criteria
-         */
         private String filterInventory(String make, String model, Integer minYear, Double maxPrice) {
             StringBuilder result = new StringBuilder();
             for (Vehicle vehicle : dealership.getVehicles()) {
@@ -684,13 +556,6 @@ public class LoginFrame extends JFrame {
             return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
         }
     
-        /**
-         * Create a new user profile
-         * Only accessible by admin users
-         *
-         * @throws SQLException if a database access error occurs
-         * @throws Exception for other errors
-         */
         private void createNewProfile() throws SQLException, Exception {
             if (!(user instanceof Admin)) {
                 JOptionPane.showMessageDialog(this, "Only admins can create profiles!");
@@ -745,12 +610,7 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        /**
-         * Show list of all employees
-         * Provides options to manage user accounts
-         *
-         * @throws SQLException if a database access error occurs
-         */
+
         private void showEmployeeList() throws SQLException {
             List<User> users = dealership.getUsers();
             if (users.isEmpty()) {
@@ -807,12 +667,6 @@ public class LoginFrame extends JFrame {
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{"OK"}, "OK");
         }
         
-        /**
-         * Reload and display updated employee information
-         *
-         * @param table - the table to refresh with updated employee data
-         * @throws SQLException if a database access error occurs
-         */
         private void refreshEmployeeTable(JTable table) throws SQLException {
             List<User> updatedUsers = dealership.getUsers();
             DefaultTableModel model = (DefaultTableModel) table.getModel();
@@ -827,13 +681,6 @@ public class LoginFrame extends JFrame {
             model.fireTableDataChanged(); // Refresh the table display
         }
     
-        /**
-         * Toggle user active status
-         *
-         * @param users - list of users
-         * @throws SQLException if a database access error occurs
-         * @throws Exception for other errors
-         */
         private void toggleActiveStatus(List<User> users) throws SQLException, Exception {
             String username = JOptionPane.showInputDialog(this, "Enter username to toggle active status:");
             if (username == null) return;
@@ -849,12 +696,6 @@ public class LoginFrame extends JFrame {
             }
         }
     
-        /**
-         * Edit user permissions
-         *
-         * @param users - list of users
-         * @param table - table displaying user information
-         */
         private void editPermissions(List<User> users, JTable table) {
             String username = JOptionPane.showInputDialog(this, "Enter username to edit permissions:");
             if (username == null) return;
@@ -905,7 +746,7 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Permissions updated for " + username + ": " + targetUser.getPermissions());
                     // Refresh the Employee List table
                     refreshEmployeeTable(table);
-                    // Refresh current admin's permissions if self-editing
+                    // Refresh current admin’s permissions if self-editing
                     if (targetUser.getUsername().equals(this.user.getUsername())) {
                         this.user.loadPermissions();
                     }
@@ -919,14 +760,7 @@ public class LoginFrame extends JFrame {
             }
         }
         
-        /**
-         * Update user permissions in the database
-         *
-         * @param user - the user whose permissions are being updated
-         * @param checkBoxes - checkboxes representing permission settings
-         * @param dbPermissions - database permission names
-         * @throws SQLException if a database access error occurs
-         */
+        // Helper method to update permissions in the database
         private void updatePermissionsInDB(User user, JCheckBox[] checkBoxes, String[] dbPermissions) throws SQLException {
             DBManager db = DBManager.getInstance();
             // Clear existing permissions for the user
@@ -947,12 +781,7 @@ public class LoginFrame extends JFrame {
             }
         }
                 
-        /**
-         * Manage password reset requests
-         *
-         * @throws SQLException if a database access error occurs
-         * @throws Exception for other errors
-         */
+    
         private void managePasswords() throws SQLException, Exception {
             if (!(user instanceof Admin)) {
                 JOptionPane.showMessageDialog(this, "Only admins can manage passwords!");
@@ -992,38 +821,14 @@ public class LoginFrame extends JFrame {
             }
         }
     
-        /**
-         * Get user permissions as formatted string
-         *
-         * @param user - the user whose permissions to format
-         * @return formatted string of user permissions
-         */
         private String getPermissions(User user) {
             return user.getPermissions(); // Use dynamic permissions from User class
         }
     
-        /**
-         * Apply standard styling to a button
-         *
-         * @param button - the button to style
-         * @param color - the background color (hex code)
-         * @param x - the x-coordinate position
-         * @param y - the y-coordinate position
-         */
         private void setButtonStyle(JButton button, String color, int x, int y) {
             setButtonStyle(button, color, x, y, 150, 70);
         }
     
-        /**
-         * Apply custom styling to a button
-         *
-         * @param button - the button to style
-         * @param color - the background color (hex code)
-         * @param x - the x-coordinate position
-         * @param y - the y-coordinate position
-         * @param width - the button width
-         * @param height - the button height
-         */
         private void setButtonStyle(JButton button, String color, int x, int y, int width, int height) {
             button.setBackground(Color.decode(color));
             button.setForeground(Color.BLACK);
@@ -1031,28 +836,8 @@ public class LoginFrame extends JFrame {
             button.setOpaque(true);
             button.setBorderPainted(false);
         }
-        private void handleLogout() {
-            int confirm = JOptionPane.showConfirmDialog(
-                this, "Are you sure you want to log out?", "Confirm Log Out",
-                JOptionPane.YES_NO_OPTION
-            );
-        
-            if (confirm == JOptionPane.YES_OPTION) {
-                System.out.println("Logging out...");
-                dispose(); // Close the current dashboard
-        
-                SwingUtilities.invokeLater(() -> {
-                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
-                    loginPage.setVisible(true);
-                });
-            }
-        }
     }
 
-    /**
-     * Dashboard interface for managers with limited administrative access
-     * Provides vehicle management and some system functions
-     */
     class ManagerDashboard extends JFrame implements ActionListener {
         private Dealership dealership;
         private User user;
@@ -1064,12 +849,7 @@ public class LoginFrame extends JFrame {
         private JMenu fileMenu;
         private JMenuItem saveItem;
 
-        /**
-         * Constructor for the ManagerDashboard class
-         *
-         * @param user - the authenticated manager user
-         * @param dealership - the dealership instance to manage
-         */
+
         public ManagerDashboard(User user, Dealership dealership) {
             this.user = user;
             this.dealership = dealership;
@@ -1082,10 +862,6 @@ public class LoginFrame extends JFrame {
             setLocationRelativeTo(null);
         }
 
-        /**
-         * Initialize the manager dashboard UI components
-         * Sets up buttons and menu items based on manager permissions
-         */
         private void initializeUI() {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Manager");
             welcomeLabel.setBounds(20, 10, 300, 25);
@@ -1106,7 +882,7 @@ public class LoginFrame extends JFrame {
  
              // Create logout button and add it to the menu bar
              JButton logoutButton = new JButton("Log Out");
-             logoutButton.addActionListener(e -> handleLogout());
+             logoutButton.addActionListener(this);
              menuBar.add(logoutButton);
  
              setJMenuBar(menuBar);
@@ -1204,11 +980,6 @@ public class LoginFrame extends JFrame {
             }
         }
 
-        /**
-         * Handle action events from manager dashboard components
-         *
-         * @param e - the action event to be processed
-         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == searchCarButton) {
@@ -1418,15 +1189,6 @@ public class LoginFrame extends JFrame {
 
         }
 
-        /**
-         * Filter inventory based on search criteria
-         *
-         * @param make - the vehicle make to filter by (optional)
-         * @param model - the vehicle model to filter by (optional)
-         * @param minYear - the minimum vehicle year to filter by (optional)
-         * @param maxPrice - the maximum vehicle price to filter by (optional)
-         * @return formatted string of vehicles matching the criteria
-         */
         private String filterInventory(String make, String model, Integer minYear, Double maxPrice) {
             StringBuilder result = new StringBuilder();
             for (Vehicle vehicle : dealership.getVehicles()) {
@@ -1444,28 +1206,10 @@ public class LoginFrame extends JFrame {
             }
             return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
         }
-        private void handleLogout() {
-            int confirm = JOptionPane.showConfirmDialog(
-                this, "Are you sure you want to log out?", "Confirm Log Out",
-                JOptionPane.YES_NO_OPTION
-            );
-        
-            if (confirm == JOptionPane.YES_OPTION) {
-                System.out.println("Logging out...");
-                dispose(); // Close the current dashboard
-        
-                SwingUtilities.invokeLater(() -> {
-                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
-                    loginPage.setVisible(true);
-                });
-            }
-        }   
+
+
     }
 
-    /**
-     * Dashboard interface for salespersons with limited system access
-     * Primarily focused on vehicle sales and inventory viewing
-     */
     class SalespersonDashboard extends JFrame implements ActionListener {
         private Dealership dealership;
         private User user;
@@ -1476,12 +1220,6 @@ public class LoginFrame extends JFrame {
         private JMenu fileMenu;
         private JMenuItem saveItem;
     
-        /**
-         * Constructor for the SalespersonDashboard class
-         *
-         * @param user - the authenticated salesperson user
-         * @param dealership - the dealership instance to work with
-         */
         public SalespersonDashboard(User user, Dealership dealership) {
             this.user = user;
             this.dealership = dealership;
@@ -1494,10 +1232,6 @@ public class LoginFrame extends JFrame {
             setLocationRelativeTo(null);
         }
     
-        /**
-         * Initialize the salesperson dashboard UI components
-         * Sets up buttons and menu items based on salesperson permissions
-         */
         private void initializeUI() {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Salesperson");
             welcomeLabel.setBounds(20, 10, 300, 25);
@@ -1508,11 +1242,9 @@ public class LoginFrame extends JFrame {
             saveItem = new JMenuItem("Save");
             fileMenu.add(saveItem);
             menuBar.add(fileMenu);
-
-
             menuBar.add(Box.createHorizontalGlue());
             JButton logoutButton = new JButton("Log Out");
-            logoutButton.addActionListener(e -> handleLogout());
+            logoutButton.addActionListener(this);
             menuBar.add(logoutButton);
             setJMenuBar(menuBar);
     
@@ -1582,161 +1314,143 @@ public class LoginFrame extends JFrame {
             }
         }
     
-        /**
-         * Handle action events from salesperson dashboard components
-         *
-         * @param e - the action event to be processed
-         */
         @Override
-        public void actionPerformed(ActionEvent e) {
-            if (e.getSource() instanceof JButton && "Log Out".equals(((JButton) e.getSource()).getText())) {
-                dispose();
-                new LoginFrame(dealership).setVisible(true);
-            } else if (e.getSource() == addVehicleButton) {
-                SwingUtilities.invokeLater(() -> {
-                    if (!dealership.isFull()) {
-                        VehicleMenu vehicleMenu = new VehicleMenu(dealership);
-                        vehicleMenu.setVisible(true);
-                        vehicleMenu.addWindowListener(new WindowAdapter() {
-                            @Override
-                            public void windowClosed(WindowEvent e) {
-                                showInventory();
-                            }
-                        });
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Sorry, your inventory is full!");
+public void actionPerformed(ActionEvent e) {
+    if (e.getSource() instanceof JButton && "Log Out".equals(((JButton) e.getSource()).getText())) {
+        dispose();
+        new LoginFrame(dealership).setVisible(true);
+    } else if (e.getSource() == addVehicleButton) {
+        SwingUtilities.invokeLater(() -> {
+            if (!dealership.isFull()) {
+                VehicleMenu vehicleMenu = new VehicleMenu(dealership);
+                vehicleMenu.setVisible(true);
+                vehicleMenu.addWindowListener(new WindowAdapter() {
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        showInventory();
                     }
                 });
-            } else if (e.getSource() == sellVehicleButton) {
-                try {
-                    String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
-                    if (idString == null) return;
-                    int id = Integer.parseInt(idString);
-                    if (dealership.getIndexFromId(id) == -1) {
-                        JOptionPane.showMessageDialog(this, "Vehicle not found!");
-                        return;
-                    }
-                    String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
-                    String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
-                    Vehicle vehicle = dealership.getVehicleFromId(id);
-                    try {
-                        if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-                            JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
-                            showInventory();
-                        } else {
-                            JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
-                        }
-                    } catch (SQLException ex) {
-                        JOptionPane.showMessageDialog(this, "An error occurred while selling the vehicle: " + ex.getMessage());
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
-                }
-            } else if (e.getSource() == removeVehicleButton) {
-                try {
-                    String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
-                    if (idString == null) return;
-                    int id = Integer.parseInt(idString);
-                    if (dealership.getIndexFromId(id) == -1) {
-                        JOptionPane.showMessageDialog(this, "Vehicle not found!");
-                    } else {
-                        Vehicle vehicle = dealership.getVehicleFromId(id);
-                        int confirm = JOptionPane.showConfirmDialog(this,
-                                "Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
-                                JOptionPane.YES_NO_OPTION);
-                        if (confirm == JOptionPane.YES_OPTION) {
-                            try {
-                                if (dealership.removeVehicle(vehicle)) {
-                                    JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
-                                } else {
-                                    JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
-                                }
-                            } catch (SQLException sqlException) {
-                                JOptionPane.showMessageDialog(this, "An error occurred while removing the vehicle: " + sqlException.getMessage());
-                            }
-                        }
-                    }
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
-                }
-            } else if (e.getSource() == searchCarButton) {
-                if (dealership.isEmpty()) {
-                    JOptionPane.showMessageDialog(this, "Inventory is empty!");
+            } else {
+                JOptionPane.showMessageDialog(this, "Sorry, your inventory is full!");
+            }
+        });
+    } else if (e.getSource() == sellVehicleButton) {
+        try {
+            String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
+            if (idString == null) return;
+            int id = Integer.parseInt(idString);
+            if (dealership.getIndexFromId(id) == -1) {
+                JOptionPane.showMessageDialog(this, "Vehicle not found!");
+                return;
+            }
+            String buyerName = JOptionPane.showInputDialog(this, "Enter the buyer's name:");
+            String buyerContact = JOptionPane.showInputDialog(this, "Enter the buyer's contact:");
+            Vehicle vehicle = dealership.getVehicleFromId(id);
+            try {
+                if (dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
+                    JOptionPane.showMessageDialog(this, "Vehicle sold successfully.");
+                    showInventory();
                 } else {
-                    JPanel filterPanel = new JPanel(new GridLayout(0, 2));
-                    JTextField makeField = new JTextField();
-                    JTextField modelField = new JTextField();
-                    JTextField minYearField = new JTextField();
-                    JTextField maxPriceField = new JTextField();
-                    filterPanel.add(new JLabel("Make (optional):")); filterPanel.add(makeField);
-                    filterPanel.add(new JLabel("Model (optional):")); filterPanel.add(modelField);
-                    filterPanel.add(new JLabel("Min Year (optional):")); filterPanel.add(minYearField);
-                    filterPanel.add(new JLabel("Max Price (optional):")); filterPanel.add(maxPriceField);
-
-                    int result = JOptionPane.showConfirmDialog(this, filterPanel, "Search Inventory", JOptionPane.OK_CANCEL_OPTION);
-                    if (result == JOptionPane.OK_OPTION) {
-                        String make = makeField.getText().trim().isEmpty() ? null : makeField.getText().trim();
-                        String model = modelField.getText().trim().isEmpty() ? null : modelField.getText().trim();
-                        Integer minYear = minYearField.getText().trim().isEmpty() ? null : Integer.parseInt(minYearField.getText().trim());
-                        Double maxPrice = maxPriceField.getText().trim().isEmpty() ? null : Double.parseDouble(maxPriceField.getText().trim());
-
-                        String filteredResult = filterInventory(make, model, minYear, maxPrice);
-                        textArea = new JTextArea(filteredResult);
-                        textArea.setEditable(false);
-                        scrollPane = new JScrollPane(textArea);
-                        scrollPane.setPreferredSize(new Dimension(400, 300));
-                        JOptionPane.showMessageDialog(this, scrollPane, "Search Results", JOptionPane.PLAIN_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Couldn't sell vehicle.");
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(this, "An error occurred while selling the vehicle: " + ex.getMessage());
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
+        }
+    } else if (e.getSource() == removeVehicleButton) {
+        try {
+            String idString = JOptionPane.showInputDialog(this, "Enter the id of the vehicle:");
+            if (idString == null) return;
+            int id = Integer.parseInt(idString);
+            if (dealership.getIndexFromId(id) == -1) {
+                JOptionPane.showMessageDialog(this, "Vehicle not found!");
+            } else {
+                Vehicle vehicle = dealership.getVehicleFromId(id);
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to delete this vehicle\nwith id: " + id, "Confirm Deletion",
+                        JOptionPane.YES_NO_OPTION);
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        if (dealership.removeVehicle(vehicle)) {
+                            JOptionPane.showMessageDialog(this, "Vehicle removed successfully.");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Couldn't remove vehicle.");
+                        }
+                    } catch (SQLException sqlException) {
+                        JOptionPane.showMessageDialog(this, "An error occurred while removing the vehicle: " + sqlException.getMessage());
                     }
                 }
-            } else if (e.getSource() == salesHistoryButton) {
-                textArea = new JTextArea(dealership.showSalesHistory());
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
+        }
+    } else if (e.getSource() == searchCarButton) {
+        if (dealership.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Inventory is empty!");
+        } else {
+            JPanel filterPanel = new JPanel(new GridLayout(0, 2));
+            JTextField makeField = new JTextField();
+            JTextField modelField = new JTextField();
+            JTextField minYearField = new JTextField();
+            JTextField maxPriceField = new JTextField();
+            filterPanel.add(new JLabel("Make (optional):")); filterPanel.add(makeField);
+            filterPanel.add(new JLabel("Model (optional):")); filterPanel.add(modelField);
+            filterPanel.add(new JLabel("Min Year (optional):")); filterPanel.add(minYearField);
+            filterPanel.add(new JLabel("Max Price (optional):")); filterPanel.add(maxPriceField);
+
+            int result = JOptionPane.showConfirmDialog(this, filterPanel, "Search Inventory", JOptionPane.OK_CANCEL_OPTION);
+            if (result == JOptionPane.OK_OPTION) {
+                String make = makeField.getText().trim().isEmpty() ? null : makeField.getText().trim();
+                String model = modelField.getText().trim().isEmpty() ? null : modelField.getText().trim();
+                Integer minYear = minYearField.getText().trim().isEmpty() ? null : Integer.parseInt(minYearField.getText().trim());
+                Double maxPrice = maxPriceField.getText().trim().isEmpty() ? null : Double.parseDouble(maxPriceField.getText().trim());
+
+                String filteredResult = filterInventory(make, model, minYear, maxPrice);
+                textArea = new JTextArea(filteredResult);
                 textArea.setEditable(false);
                 scrollPane = new JScrollPane(textArea);
                 scrollPane.setPreferredSize(new Dimension(400, 300));
-                JOptionPane.showMessageDialog(this, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
-            } else if (e.getSource() == saveItem) {
-                File saveFile = new File("save.data");
-                try (FileOutputStream outFileStream = new FileOutputStream(saveFile);
-                    ObjectOutputStream outObjStream = new ObjectOutputStream(outFileStream)) {
-                    outObjStream.writeObject(dealership);
-                    JOptionPane.showMessageDialog(this, "Dealership saved!");
-                } catch (IOException ex) {
-                    JOptionPane.showMessageDialog(this, "Error saving dealership: " + ex.getMessage());
-                }
+                JOptionPane.showMessageDialog(this, scrollPane, "Search Results", JOptionPane.PLAIN_MESSAGE);
             }
         }
-
-        /**
-         * Filter inventory based on search criteria
-         *
-         * @param make - the vehicle make to filter by (optional)
-         * @param model - the vehicle model to filter by (optional)
-         * @param minYear - the minimum vehicle year to filter by (optional)
-         * @param maxPrice - the maximum vehicle price to filter by (optional)
-         * @return formatted string of vehicles matching the criteria
-         */
-        private String filterInventory(String make, String model, Integer minYear, Double maxPrice) {
-            StringBuilder result = new StringBuilder();
-            for (Vehicle vehicle : dealership.getVehicles()) {
-                if (vehicle == null) continue;
-                boolean matches = true;
-
-                if (make != null && !vehicle.getMake().equalsIgnoreCase(make)) matches = false;
-                if (model != null && !vehicle.getModel().equalsIgnoreCase(model)) matches = false;
-                if (minYear != null && vehicle.getYear() < minYear) matches = false;
-                if (maxPrice != null && vehicle.getPrice() > maxPrice) matches = false;
-
-                if (matches) {
-                    result.append(vehicle.toString()).append("\n--------------------\n");
-                }
-            }
-            return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
+    } else if (e.getSource() == salesHistoryButton) {
+        textArea = new JTextArea(dealership.showSalesHistory());
+        textArea.setEditable(false);
+        scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(400, 300));
+        JOptionPane.showMessageDialog(this, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
+    } else if (e.getSource() == saveItem) {
+        File saveFile = new File("save.data");
+        try (FileOutputStream outFileStream = new FileOutputStream(saveFile);
+             ObjectOutputStream outObjStream = new ObjectOutputStream(outFileStream)) {
+            outObjStream.writeObject(dealership);
+            JOptionPane.showMessageDialog(this, "Dealership saved!");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Error saving dealership: " + ex.getMessage());
         }
+    }
+}
+
+private String filterInventory(String make, String model, Integer minYear, Double maxPrice) {
+    StringBuilder result = new StringBuilder();
+    for (Vehicle vehicle : dealership.getVehicles()) {
+        if (vehicle == null) continue;
+        boolean matches = true;
+
+        if (make != null && !vehicle.getMake().equalsIgnoreCase(make)) matches = false;
+        if (model != null && !vehicle.getModel().equalsIgnoreCase(model)) matches = false;
+        if (minYear != null && vehicle.getYear() < minYear) matches = false;
+        if (maxPrice != null && vehicle.getPrice() > maxPrice) matches = false;
+
+        if (matches) {
+            result.append(vehicle.toString()).append("\n--------------------\n");
+        }
+    }
+    return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
+}
     
-        /**
-         * Display current inventory in a dialog
-         * Shows all vehicles currently in the system
-         */
         private void showInventory() {
             StringBuilder inventory = new StringBuilder("Current Inventory:\n");
             for (Vehicle vehicle : dealership.getVehicles()) {
@@ -1750,19 +1464,6 @@ public class LoginFrame extends JFrame {
             scrollPane.setPreferredSize(new Dimension(400, 300));
             JOptionPane.showMessageDialog(this, scrollPane, "Current Inventory", JOptionPane.PLAIN_MESSAGE);
         }
-        private void handleLogout() {
-            int confirm = JOptionPane.showConfirmDialog(
-                this, "Are you sure you want to log out?", "Confirm Log Out",
-                JOptionPane.YES_NO_OPTION
-            );
-            if (confirm == JOptionPane.YES_OPTION) {
-                System.out.println("Logging out...");
-                dispose(); // Close the current dashboard
-                SwingUtilities.invokeLater(() -> {
-                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
-                    loginPage.setVisible(true);
-                });
-            }
-        }  
     }
+
 }

@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run Car Dealership App",
+      "request": "launch",
+      "mainClass": "carDealership.Main",
+      "classPaths": [
+        "${workspaceFolder}/out",
+        "${workspaceFolder}/libs/sqlite-jdbc-3.49.1.0.jar"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

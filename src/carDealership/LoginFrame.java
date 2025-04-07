@@ -18,6 +18,17 @@ import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
 
+/**
+  * Car Dealership System
+  *
+  * @author Ronika Patel (40156217)
+  * @author Nazim Chaib Cherif-Baza (40017992)
+  * @author Andrea Delgado Anderson (40315869)
+  * @author Grace Pan (40302283)
+  * @author Bao Tran Nguyen (40257379)
+  * @author Michael Persico (40090861)
+  * @since 1.8
+  */
 
 public class LoginFrame extends JFrame {
     private static final long serialVersionUID = 1L;
@@ -26,7 +37,8 @@ public class LoginFrame extends JFrame {
     private JButton loginButton;
     private JLabel statusLabel;
     private Dealership dealership;
-
+    private JButton forgotPasswordButton;
+    
     public LoginFrame(Dealership dealership) {
         this.dealership = dealership;
         initializeUI();
@@ -58,15 +70,77 @@ public class LoginFrame extends JFrame {
         loginButton.setBounds(300, 200, 100, 30);
         add(loginButton);
 
+        // 🔹 Forgot Password Button
+        JButton forgotPasswordButton = new JButton("Forgot Password?");
+        int buttonWidth = 150;
+        int buttonHeight = 30;
+        int frameWidth = 700; // Frame width set in setBounds
+        int xPos = (frameWidth - buttonWidth) / 2; // Center the button horizontally
+        int yPos = 240; // Keep the same vertical position
+        forgotPasswordButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
+        add(forgotPasswordButton);
+
+
         statusLabel = new JLabel("");
         statusLabel.setBounds(200, 250, 250, 25);
         add(statusLabel);
 
         loginButton.addActionListener(e -> authenticateUser());
 
+         // 🔹 Add action listener for forgot password
+         forgotPasswordButton.addActionListener(e -> handleForgotPassword());
+
         setLocationRelativeTo(null);
         setVisible(true);
     }
+
+
+    private void handleForgotPassword() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(new JLabel("Did you forget your password? Send a request to the admin."));
+        panel.add(new JLabel("Enter your username:"));
+    
+        // Add a smaller text field for username input
+        JTextField usernameInput = new JTextField();
+        usernameInput.setPreferredSize(new Dimension(100, 25)); // Smaller square field
+        panel.add(usernameInput);
+    
+        int choice = JOptionPane.showOptionDialog(this,
+            panel,
+            "Forgot Password",
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            null,
+            null);
+    
+        if (choice == JOptionPane.OK_OPTION) {
+            String username = usernameInput.getText().trim();
+            if (!username.isEmpty()) {
+                try {
+                    User user = User.loadUser(username);
+                    if (user != null) {
+                        if (user.isActive()) {
+                            dealership.addPasswordResetRequest(user);
+                            JOptionPane.showMessageDialog(this, "Password reset request sent to admin.");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Your account is inactive. Please contact an administrator.");
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(this, "User not found.");
+                    }
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(this, "A database error occurred: " + e.getMessage());
+                } catch (Exception e) {
+                    JOptionPane.showMessageDialog(this, "An error occurred: " + e.getMessage());
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Username cannot be empty!");
+            }
+        }
+    }
+
 
 
     public static User loadUser(String username) throws SQLException, Exception {
@@ -243,7 +317,7 @@ public class LoginFrame extends JFrame {
         
             // Create logout button and add it to the menu bar
             JButton logoutButton = new JButton("Log Out");
-            logoutButton.addActionListener(this);
+            logoutButton.addActionListener(e -> handleLogout());
             menuBar.add(logoutButton);
         
             setJMenuBar(menuBar);
@@ -836,6 +910,22 @@ public class LoginFrame extends JFrame {
             button.setOpaque(true);
             button.setBorderPainted(false);
         }
+        private void handleLogout() {
+            int confirm = JOptionPane.showConfirmDialog(
+                this, "Are you sure you want to log out?", "Confirm Log Out",
+                JOptionPane.YES_NO_OPTION
+            );
+        
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.out.println("Logging out...");
+                dispose(); // Close the current dashboard
+        
+                SwingUtilities.invokeLater(() -> {
+                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
+                    loginPage.setVisible(true);
+                });
+            }
+        }
     }
 
     class ManagerDashboard extends JFrame implements ActionListener {
@@ -882,7 +972,7 @@ public class LoginFrame extends JFrame {
  
              // Create logout button and add it to the menu bar
              JButton logoutButton = new JButton("Log Out");
-             logoutButton.addActionListener(this);
+             logoutButton.addActionListener(e -> handleLogout());
              menuBar.add(logoutButton);
  
              setJMenuBar(menuBar);
@@ -1207,6 +1297,22 @@ public class LoginFrame extends JFrame {
             return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
         }
 
+        private void handleLogout() {
+            int confirm = JOptionPane.showConfirmDialog(
+                this, "Are you sure you want to log out?", "Confirm Log Out",
+                JOptionPane.YES_NO_OPTION
+            );
+        
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.out.println("Logging out...");
+                dispose(); // Close the current dashboard
+        
+                SwingUtilities.invokeLater(() -> {
+                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
+                    loginPage.setVisible(true);
+                });
+            }
+        }  
 
     }
 
@@ -1244,7 +1350,7 @@ public class LoginFrame extends JFrame {
             menuBar.add(fileMenu);
             menuBar.add(Box.createHorizontalGlue());
             JButton logoutButton = new JButton("Log Out");
-            logoutButton.addActionListener(this);
+            logoutButton.addActionListener(e -> handleLogout());
             menuBar.add(logoutButton);
             setJMenuBar(menuBar);
     
@@ -1464,6 +1570,21 @@ private String filterInventory(String make, String model, Integer minYear, Doubl
             scrollPane.setPreferredSize(new Dimension(400, 300));
             JOptionPane.showMessageDialog(this, scrollPane, "Current Inventory", JOptionPane.PLAIN_MESSAGE);
         }
+
+        private void handleLogout() {
+            int confirm = JOptionPane.showConfirmDialog(
+                this, "Are you sure you want to log out?", "Confirm Log Out",
+                JOptionPane.YES_NO_OPTION
+            );
+            if (confirm == JOptionPane.YES_OPTION) {
+                System.out.println("Logging out...");
+                dispose(); // Close the current dashboard
+                SwingUtilities.invokeLater(() -> {
+                    LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
+                    loginPage.setVisible(true);
+                });
+            }
+        }  
     }
 
 }

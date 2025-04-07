@@ -103,7 +103,7 @@ public class Sale implements Serializable {
 	/**
 	 * Setter method for the sale date
 	 *
-	 * @param saleDate - the new sale date to set
+	 * @param saleDate - the new sale date to sets
 	 */
 	public void setSaleDate(LocalDate saleDate) {
 		this.saleDate = saleDate;

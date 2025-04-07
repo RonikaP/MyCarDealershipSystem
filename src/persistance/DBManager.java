@@ -70,6 +70,86 @@ public class DBManager {
 		return stmt.executeQuery();
 	}
 
+
+
+
+  public static String getSalespersonPerformanceReport() {
+    StringBuilder report = new StringBuilder();
+    report.append("Salesperson Performance (Last 12 Months)\n\n");
+
+    String sql = """
+        SELECT
+            u.name AS salesperson_name,
+            COUNT(s.sale_id) AS vehicles_sold,
+            SUM(v.price) AS total_revenue,
+            AVG(v.price) AS avg_price
+        FROM Sales s
+        JOIN users u ON s.user_id = u.user_id
+        JOIN Vehicle v ON s.vehicle_id = v.vehicle_id
+        WHERE s.sale_date >= date('now', '-12 months')
+        GROUP BY s.user_id
+        ORDER BY total_revenue DESC;
+    """;
+
+    try {
+        ResultSet rs = getInstance().runQuery(sql);
+        while (rs.next()) {
+            String name = rs.getString("salesperson_name");
+            int sold = rs.getInt("vehicles_sold");
+            double revenue = rs.getDouble("total_revenue");
+            double avg = rs.getDouble("avg_price");
+
+            report.append(name).append("\n")
+                  .append("---------------------\n")
+                  .append("Total Vehicles Sold: ").append(sold).append("\n")
+                  .append(String.format("Total Revenue: $%,.2f\n", revenue))
+                  .append(String.format("Average Sale: $%,.2f\n", avg))
+                  .append("\n");
+        }
+        rs.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        report.append("Error generating report.");
+    }
+
+    return report.toString();
+  }
+
+  public static String getModelSalesReport() {
+    StringBuilder report = new StringBuilder();
+    report.append("Model Sales (Last 12 Months)\n\n");
+
+    String sql = """
+        SELECT
+            v.make || ' ' || v.model AS full_model_name,
+            COUNT(s.sale_id) AS units_sold
+        FROM Sales s
+        JOIN Vehicle v ON s.vehicle_id = v.vehicle_id
+        WHERE s.sale_date >= date('now', '-12 months')
+        GROUP BY v.make, v.model
+        ORDER BY units_sold DESC;
+    """;
+
+    try {
+        ResultSet rs = getInstance().runQuery(sql);
+        while (rs.next()) {
+            String model = rs.getString("full_model_name");
+            int count = rs.getInt("units_sold");
+
+            report.append(model).append("\n")
+                  .append("---------------------\n")
+                  .append("Units Sold: ").append(count).append("\n\n");
+        }
+        rs.close();
+    } catch (SQLException e) {
+        e.printStackTrace();
+        report.append("Error generating model sales report.");
+    }
+
+    return report.toString();
+  }
+
+
 	/**
 	 * Execute an SQL update statement with the provided parameters
 	 *
@@ -147,7 +227,7 @@ public class DBManager {
 
 		var addManagerRoleSQL = "INSERT INTO roles (role_name) VALUES ('Manager');";
 		stmt.execute(addManagerRoleSQL);
-		
+
 		var addSalesPersonRoleSQL = "INSERT INTO roles (role_name) VALUES ('Salesperson');";
 		stmt.execute(addSalesPersonRoleSQL);
 

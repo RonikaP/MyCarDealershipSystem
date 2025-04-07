@@ -93,9 +93,9 @@ public class Dealership implements Serializable {
             return false;
         }
 
-        // Assign unique ID
-        vehicle.setId(nextId++);
-
+        // Don't assign ID yet - we'll get it from the database
+        int vehicleIndex = nv;
+        
         // Add to in-memory inventory
         if (vehicle instanceof Car) {
             inventory[nv++] = new Car((Car) vehicle);
@@ -103,20 +103,52 @@ public class Dealership implements Serializable {
             inventory[nv++] = new Motorcycle((Motorcycle) vehicle);
         }
 
-        // Persist to database
-        DBManager db = DBManager.getInstance();
-        String query = "INSERT INTO Vehicle (vehicle_id, make, model, color, year, price, " +
-                (vehicle instanceof Car ? "car_type" : "handlebar_type") +
-                ", dealerships_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-        Object[] params = {
-            vehicle.getId(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
-            vehicle.getYear(), vehicle.getPrice(),
-            vehicle instanceof Car ? ((Car) vehicle).getType() : ((Motorcycle) vehicle).getHandlebarType(),
-            m_dealershipLayer.getDealershipId()
-        };
-        db.runInsert(query, params);
-
-        return true;
+        try {
+            // Persist to database without specifying vehicle_id
+            DBManager db = DBManager.getInstance();
+            String query = "INSERT INTO Vehicle (make, model, color, year, price, " +
+                    (vehicle instanceof Car ? "car_type" : "handlebar_type") +
+                    ", dealerships_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            Object[] params = {
+                vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
+                vehicle.getYear(), vehicle.getPrice(),
+                vehicle instanceof Car ? ((Car) vehicle).getType() : ((Motorcycle) vehicle).getHandlebarType(),
+                m_dealershipLayer.getDealershipId()
+            };
+            
+            // Execute the insert
+            db.runInsert(query, params);
+            
+            // Get the auto-generated ID from the database
+            ResultSet rs = db.runQuery("SELECT last_insert_rowid()");
+            if (rs.next()) {
+                int generatedId = rs.getInt(1);
+                
+                // Update both the original vehicle and the inventory copy with the database ID
+                vehicle.setId(generatedId);
+                inventory[vehicleIndex].setId(generatedId);
+                
+                // Update nextId to be greater than any assigned ID to avoid future conflicts
+                if (generatedId >= nextId) {
+                    nextId = generatedId + 1;
+                }
+            }
+            return true;
+        } catch (SQLException e) {
+            // If database operation fails, remove the vehicle from inventory
+            if (vehicleIndex < nv) {
+                // Shift all elements after the failed vehicle one position back
+                for (int i = vehicleIndex; i < nv - 1; i++) {
+                    inventory[i] = inventory[i + 1];
+                }
+                // Clear the last element and decrement count
+                inventory[nv - 1] = null;
+                nv--;
+            }
+            // Re-throw the exception for proper handling upstream
+            throw e;
+        }
+        // No need for additional return statement - the try block returns true if successful
     }
 
     /**

@@ -39,7 +39,7 @@ public class FirstLaunchPage extends JFrame {
 	 * This frame collects dealership name, location, and inventory capacity
 	 */
 	public FirstLaunchPage() {
-		setIconImage(Toolkit.getDefaultToolkit().getImage(FirstLaunchPage.class.getResource("/images/icon.jpg")));
+		setIconImage(Toolkit.getDefaultToolkit().getImage("src/images/icon.jpg"));
 		setTitle("Dealership System");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 650, 400);
@@ -57,7 +57,7 @@ public class FirstLaunchPage extends JFrame {
 		panel.setLayout(null);
 
 		JLabel lblNewLabel_1 = new JLabel("");
-		lblNewLabel_1.setIcon(new ImageIcon(FirstLaunchPage.class.getResource("/images/bg.jpg")));
+		lblNewLabel_1.setIcon(new ImageIcon("src/images/bg.jpg"));
 		lblNewLabel_1.setBounds(-242, 0, 509, 256);
 		panel.add(lblNewLabel_1);
 

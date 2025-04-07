@@ -46,9 +46,9 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		setLocationRelativeTo(null);
 		
 		// Load and scale icons
-		// For loading images as resources
-		ImageIcon carIcon = new ImageIcon(getClass().getResource("/images/auto.png"));
-		ImageIcon motoIcon = new ImageIcon(getClass().getResource("/images/moto.png"));
+		// Use file paths instead of resources to ensure images are found
+		ImageIcon carIcon = new ImageIcon("src/images/auto.png");
+		ImageIcon motoIcon = new ImageIcon("src/images/moto.png");
 
 
 		Image carImg = carIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);

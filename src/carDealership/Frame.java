@@ -183,7 +183,7 @@ public class Frame extends JFrame implements ActionListener {
 		jf1.setVisible(true);
 		jf1.setBounds(0, 0, 1170, 600);
 		jf1.setResizable(false);
-		jf1.setIconImage(Toolkit.getDefaultToolkit().getImage(FirstLaunchPage.class.getResource("/images/icon.jpg")));
+		jf1.setIconImage(Toolkit.getDefaultToolkit().getImage("src/images/icon.jpg"));
 
 		jf1.add(m_displayAllButton);
 		jf1.add(m_addVehicleButton);

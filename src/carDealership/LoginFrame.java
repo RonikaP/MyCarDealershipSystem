@@ -1477,11 +1477,7 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Invalid input. Year and price must be numeric values.");
                 }
             } else if (e.getSource() == salesHistoryButton) {
-                textArea = new JTextArea(dealership.showSalesHistory());
-                textArea.setEditable(false);
-                scrollPane = new JScrollPane(textArea);
-                scrollPane.setPreferredSize(new Dimension(400, 300));
-                JOptionPane.showMessageDialog(this, scrollPane, "Sales History", JOptionPane.PLAIN_MESSAGE);
+                displaySalesHistory();
             } else if (e.getSource() == searchCarButton) {
                 String budgetText = JOptionPane.showInputDialog(this, "Enter Budget:");
                 if (budgetText == null) return;

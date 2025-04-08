@@ -92,30 +92,41 @@ public class Dealership implements Serializable {
         if (nv == inventory.length) {
             return false;
         }
-
-        // Assign unique ID
-        vehicle.setId(nextId++);
-
-        // Add to in-memory inventory
-        if (vehicle instanceof Car) {
-            inventory[nv++] = new Car((Car) vehicle);
-        } else if (vehicle instanceof Motorcycle) {
-            inventory[nv++] = new Motorcycle((Motorcycle) vehicle);
-        }
-
-        // Persist to database
+    
+        // Persist to database first, letting SQLite assign the vehicle_id
         DBManager db = DBManager.getInstance();
-        String query = "INSERT INTO Vehicle (vehicle_id, make, model, color, year, price, " +
+        String query = "INSERT INTO Vehicle (make, model, color, year, price, " +
                 (vehicle instanceof Car ? "car_type" : "handlebar_type") +
-                ", dealerships_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                ", dealerships_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
         Object[] params = {
-            vehicle.getId(), vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
+            vehicle.getMake(), vehicle.getModel(), vehicle.getColor(),
             vehicle.getYear(), vehicle.getPrice(),
             vehicle instanceof Car ? ((Car) vehicle).getType() : ((Motorcycle) vehicle).getHandlebarType(),
             m_dealershipLayer.getDealershipId()
         };
         db.runInsert(query, params);
-
+    
+        // Retrieve the last inserted vehicle_id from the database
+        ResultSet rs = db.runQuery("SELECT last_insert_rowid() AS vehicle_id");
+        int newVehicleId = 0;
+        if (rs.next()) {
+            newVehicleId = rs.getInt("vehicle_id");
+        }
+        rs.close();
+    
+        // Assign the database-generated ID to the vehicle
+        vehicle.setId(newVehicleId);
+    
+        // Add the vehicle directly to the in-memory inventory
+        inventory[nv++] = vehicle;
+    
+        // Update nextId to be one more than the latest vehicle_id
+        ResultSet maxIdRs = db.runQuery("SELECT MAX(vehicle_id) AS max_id FROM Vehicle");
+        if (maxIdRs.next()) {
+            nextId = maxIdRs.getInt("max_id") + 1;
+        }
+        maxIdRs.close();
+    
         return true;
     }
 

@@ -257,7 +257,7 @@ public class Frame extends JFrame implements ActionListener {
 		}
 
 		if (e.getSource() == deleteDealership) {
-			int confirm = JOptionPane.showConfirmDialog(null, "⚠️ Are you sure you want to delete the dealership?",
+			int confirm = JOptionPane.showConfirmDialog(null, "Warning: Are you sure you want to delete the dealership?",
 					"Confirmation", JOptionPane.YES_NO_OPTION);
 			if (confirm == JOptionPane.YES_OPTION) {
 				System.out.println("Dealership was successfully deleted");
@@ -321,30 +321,30 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void sellVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, " 🔍 Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, " Search: Enter the id of the vehicle:");
 			if (idString == null) { // checks if no input
 				return;
 			}
 			int id = Integer.parseInt(idString);
 			if (Main.m_dealership.getIndexFromId(id) == -1) {
-				JOptionPane.showMessageDialog(null, "❌ Vehicle not found!");
+				JOptionPane.showMessageDialog(null, "X Vehicle not found!");
 				return;
 			}
-			String buyerName = JOptionPane.showInputDialog(null, "👤 Enter the buyer's name:");
-			String buyerContact = JOptionPane.showInputDialog(null, "📞 Enter the buyer's contact:");
+			String buyerName = JOptionPane.showInputDialog(null, "Name: Enter the buyer's name:");
+			String buyerContact = JOptionPane.showInputDialog(null, "Contact: Enter the buyer's contact:");
 			Vehicle vehicle = Main.m_dealership.getVehicleFromId(id);
 
 			try {
 				if (Main.m_dealership.sellVehicle(vehicle, buyerName, buyerContact)) {
-					JOptionPane.showMessageDialog(null, "✅ Vehicle sold successfully.");
+					JOptionPane.showMessageDialog(null, "Success! Vehicle sold successfully.");
 				} else {
-					JOptionPane.showMessageDialog(null, "❌ Couldn't sell vehicle.");
+					JOptionPane.showMessageDialog(null, "X Couldn't sell vehicle.");
 				}
 			} catch (SQLException e) {
 				JOptionPane.showMessageDialog(null, "Error selling vehicle: " + e.getMessage());
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid integer.");
+			JOptionPane.showMessageDialog(null, "Warning: Invalid input. Please enter a valid integer.");
 		}
 	}
 
@@ -366,7 +366,7 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void removeVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, "🔍 Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, "Search: Enter the id of the vehicle:");
 			if (idString == null) { // checks if no input
 				return;
 			}
@@ -382,17 +382,17 @@ public class Frame extends JFrame implements ActionListener {
 				if (confirm == JOptionPane.YES_OPTION) {
 					try {
 						if (Main.m_dealership.removeVehicle(vehicle)) {
-							JOptionPane.showMessageDialog(null, "✅ Vehicle removed successfully.");
+							JOptionPane.showMessageDialog(null, "Success! Vehicle removed successfully.");
 						} else {
-							JOptionPane.showMessageDialog(null, "❌ Couldn't remove vehicle.");
+							JOptionPane.showMessageDialog(null, "X Couldn't remove vehicle.");
 						}
 					} catch (SQLException e) {
-						JOptionPane.showMessageDialog(null, "⚠️ Error removing vehicle: " + e.getMessage());
+						JOptionPane.showMessageDialog(null, "Warning: Error removing vehicle: " + e.getMessage());
 					}
 				}
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid integer.");
+			JOptionPane.showMessageDialog(null, "Warning: Invalid input. Please enter a valid integer.");
 		}
 	}
 
@@ -402,7 +402,7 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private void editVehicleMenu() {
 		try {
-			String idString = JOptionPane.showInputDialog(null, "🔍 Enter the id of the vehicle:");
+			String idString = JOptionPane.showInputDialog(null, "Search: Enter the id of the vehicle:");
 
 			if (idString == null) { // checks if no input
 				return;
@@ -411,7 +411,7 @@ public class Frame extends JFrame implements ActionListener {
 			int id = Integer.parseInt(idString);
 
 			if (Main.m_dealership.getIndexFromId(id) == -1) { // check if exist
-				JOptionPane.showMessageDialog(null, "❌ Vehicle not found!");
+				JOptionPane.showMessageDialog(null, "X Vehicle not found!");
 				return;
 			}
 			Vehicle vehicle = Main.m_dealership.getVehicleFromId(id);
@@ -501,10 +501,10 @@ public class Frame extends JFrame implements ActionListener {
 					motorcycle.setPrice(Double.parseDouble(priceField.getText()));
 					motorcycle.setHandlebarType(handlebarField.getText());
 				}
-				JOptionPane.showMessageDialog(null, "✅ Vehicle edited successfully.");
+				JOptionPane.showMessageDialog(null, "Success! Vehicle edited successfully.");
 			}
 		} catch (NumberFormatException e) {
-			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Year and price must be numeric values.");
+			JOptionPane.showMessageDialog(null, "Warning: Invalid input. Year and price must be numeric values.");
 		}
 	}
 
@@ -523,7 +523,7 @@ public class Frame extends JFrame implements ActionListener {
 
 			double budget = Double.parseDouble(budgetText);
 			if (budget < 0) {
-				JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a positive number.");
+				JOptionPane.showMessageDialog(null, "Warning: Invalid input. Please enter a positive number.");
 				return;
 			}
 
@@ -547,7 +547,7 @@ public class Frame extends JFrame implements ActionListener {
 				}
 			}
 		} catch (NumberFormatException ex) {
-			JOptionPane.showMessageDialog(null, "⚠️ Invalid input. Please enter a valid number.");
+			JOptionPane.showMessageDialog(null, "Warning: Invalid input. Please enter a valid number.");
 		}
 	}
 }

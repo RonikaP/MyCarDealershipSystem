@@ -70,7 +70,7 @@ public class LoginFrame extends JFrame {
         loginButton.setBounds(300, 200, 100, 30);
         add(loginButton);
 
-        // 🔹 Forgot Password Button
+        // Note: Forgot Password Button
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         int buttonWidth = 150;
         int buttonHeight = 30;
@@ -87,7 +87,7 @@ public class LoginFrame extends JFrame {
 
         loginButton.addActionListener(e -> authenticateUser());
 
-         // 🔹 Add action listener for forgot password
+         // Note: Add action listener for forgot password
          forgotPasswordButton.addActionListener(e -> handleForgotPassword());
 
         setLocationRelativeTo(null);
@@ -820,7 +820,7 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Permissions updated for " + username + ": " + targetUser.getPermissions());
                     // Refresh the Employee List table
                     refreshEmployeeTable(table);
-                    // Refresh current admin’s permissions if self-editing
+                    // Refresh current admin's permissions if self-editing
                     if (targetUser.getUsername().equals(this.user.getUsername())) {
                         this.user.loadPermissions();
                     }

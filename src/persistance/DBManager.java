@@ -63,11 +63,29 @@ public class DBManager {
 	 */
 	public ResultSet runQuery(String query, Object... params) throws SQLException {
 		System.out.println("Will run query: " + query);
+		// Debug parameter information
+		System.out.println("Number of parameters: " + params.length);
+		for (int i = 0; i < params.length; i++) {
+			System.out.println("Parameter " + (i+1) + ": " + (params[i] == null ? "null" : "'" + params[i].toString() + "'"));
+		}
+		
 		var stmt = m_connection.prepareStatement(query);
 		for (int i = 0; i < params.length; i++) {
 			stmt.setObject(i + 1, params[i]);
 		}
-		return stmt.executeQuery();
+		
+		// Execute the query and debug results
+		ResultSet rs = stmt.executeQuery();
+		System.out.println("Query executed successfully");
+		
+		// Debug if the ResultSet has any rows
+		if (rs.isBeforeFirst()) {
+			System.out.println("Query returned at least one row");
+		} else {
+			System.out.println("Query returned no rows");
+		}
+		
+		return rs;
 	}
 
 

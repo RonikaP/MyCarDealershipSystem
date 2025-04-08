@@ -30,7 +30,7 @@ public class ReportMenu extends JDialog implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == performanceButton) {
-          JTextArea textArea = new JTextArea(DBManager.getSalespersonPerformanceReport());
+          JTextArea textArea = new JTextArea(DBManager.getSalesRepresentativeReport());
           textArea.setEditable(false);
           JScrollPane scrollPane = new JScrollPane(textArea);
           scrollPane.setPreferredSize(new Dimension(400, 300));

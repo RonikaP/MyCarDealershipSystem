@@ -30,7 +30,7 @@ import java.awt.Image;
 public class VehicleMenu extends JFrame implements ActionListener { // this class for adding a vehicle gui..
 	private JButton carButton, motorcycleButton, exitButton;
 	private Dealership dealership;
-	
+
 	/**
 	 * Constructor for the VehicleMenu class
 	 * Creates a GUI window with buttons for adding different vehicle types
@@ -44,26 +44,28 @@ public class VehicleMenu extends JFrame implements ActionListener { // this clas
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setLayout(new GridLayout(2, 1));
 		setLocationRelativeTo(null);
-		
+
 		// Load and scale icons
 		// For loading images as resources
-		ImageIcon carIcon = new ImageIcon(getClass().getResource("/images/auto.png"));
-		ImageIcon motoIcon = new ImageIcon(getClass().getResource("/images/moto.png"));
+		// ImageIcon carIcon = new ImageIcon(getClass().getResource("/images/auto.png"));
+		// ImageIcon motoIcon = new ImageIcon(getClass().getResource("/images/moto.png"));
 
 
-		Image carImg = carIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-		ImageIcon scaledCarIcon = new ImageIcon(carImg);
+		// Image carImg = carIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+		// ImageIcon scaledCarIcon = new ImageIcon(carImg);
 
-		Image motoImg = motoIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
-		ImageIcon scaledMotoIcon = new ImageIcon(motoImg);
+		// Image motoImg = motoIcon.getImage().getScaledInstance(30, 30, Image.SCALE_SMOOTH);
+		// ImageIcon scaledMotoIcon = new ImageIcon(motoImg);
 
-		carButton = new JButton("Add Car", scaledCarIcon);
+		// carButton = new JButton("Add Car", scaledCarIcon);
+    carButton = new JButton("Add Car");
 		carButton.setBackground(Color.decode("#333333"));
 		carButton.setForeground(Color.decode("#333333"));
 		carButton.addActionListener(this);
 		add(carButton);
 
-		motorcycleButton = new JButton("Add Motorcycle", scaledMotoIcon);
+		motorcycleButton = new JButton("Add Motorcycle");
+    // motorcycleButton = new JButton("Add Motorcycle", scaledMotoIcon);
 		motorcycleButton.setBackground(Color.decode("#333333"));
 		motorcycleButton.setForeground(Color.decode("#333333"));
 		motorcycleButton.addActionListener(this);

@@ -318,8 +318,10 @@ public class LoginFrame extends JFrame {
      * @param user - the authenticated user
      */
     private void loginSuccessful(User user) {
-        dispose(); // Close the login frame
-        openDashboard(user);
+      SessionManager.getInstance().setCurrentUser(user);
+
+      dispose(); // Close the login frame
+      openDashboard(user);
     }
 
     /**

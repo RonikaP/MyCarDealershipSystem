@@ -92,7 +92,7 @@ public class Dealership implements Serializable {
         if (nv == inventory.length) {
             return false;
         }
-    
+
         // Persist to database first, letting SQLite assign the vehicle_id
         DBManager db = DBManager.getInstance();
         String query = "INSERT INTO Vehicle (make, model, color, year, price, " +
@@ -105,7 +105,7 @@ public class Dealership implements Serializable {
             m_dealershipLayer.getDealershipId()
         };
         db.runInsert(query, params);
-    
+
         // Retrieve the last inserted vehicle_id from the database
         ResultSet rs = db.runQuery("SELECT last_insert_rowid() AS vehicle_id");
         int newVehicleId = 0;
@@ -113,20 +113,20 @@ public class Dealership implements Serializable {
             newVehicleId = rs.getInt("vehicle_id");
         }
         rs.close();
-    
+
         // Assign the database-generated ID to the vehicle
         vehicle.setId(newVehicleId);
-    
+
         // Add the vehicle directly to the in-memory inventory
         inventory[nv++] = vehicle;
-    
+
         // Update nextId to be one more than the latest vehicle_id
         ResultSet maxIdRs = db.runQuery("SELECT MAX(vehicle_id) AS max_id FROM Vehicle");
         if (maxIdRs.next()) {
             nextId = maxIdRs.getInt("max_id") + 1;
         }
         maxIdRs.close();
-    
+
         return true;
     }
 
@@ -168,19 +168,24 @@ public class Dealership implements Serializable {
      * @throws SQLException if a database access error occurs
      */
     public boolean sellVehicle(Vehicle vehicle, String buyerName, String buyerContact) throws SQLException {
-        if (!removeVehicle(vehicle)) {
-            return false;
-        }
+      User seller = SessionManager.getInstance().getCurrentUser();
+      if (seller == null) {
+          throw new IllegalStateException("No logged in user.");
+      }
 
-        // Add to sales in memory
-        sales[ns++] = new Sale(vehicle, buyerName, buyerContact, LocalDate.now());
+      if (!removeVehicle(vehicle)) {
+          return false;
+      }
 
-        // Persist sale to database
-        DBManager db = DBManager.getInstance();
-        db.runInsert("INSERT INTO Sales (vehicle_id, user_id, buyer_name, buyer_contact) VALUES (?, ?, ?, ?)",
-                vehicle.getId(), 1, buyerName, buyerContact); // user_id=1 as placeholder
+      // Add to sales in memory
+      sales[ns++] = new Sale(vehicle, buyerName, buyerContact, LocalDate.now(), seller.getName());
 
-        return true;
+      // Persist sale to database
+      DBManager db = DBManager.getInstance();
+      db.runInsert("INSERT INTO Sales (vehicle_id, user_id, buyer_name, buyer_contact, sales_representative, price, make, model) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+              vehicle.getId(), seller.getId(), buyerName, buyerContact, seller.name, vehicle.getPrice(), vehicle.getMake(), vehicle.getModel()); // user_id=1 as placeholder
+
+      return true;
     }
 
     /**
@@ -287,14 +292,14 @@ public class Dealership implements Serializable {
      * @return true if the inventory is full, false otherwise
      */
     public boolean isFull() { return nv == inventory.length; }
-    
+
     /**
      * Check if the dealership inventory is empty
      *
      * @return true if the inventory is empty, false otherwise
      */
     public boolean isEmpty() { return nv == 0; }
-    
+
     /**
      * Count the total number of cars in the inventory
      *
@@ -305,7 +310,7 @@ public class Dealership implements Serializable {
         for (int i = 0; i < nv; i++) if (inventory[i] instanceof Car) total++;
         return total;
     }
-    
+
     /**
      * Count the total number of motorcycles in the inventory
      *

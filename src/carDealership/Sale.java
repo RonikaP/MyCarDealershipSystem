@@ -20,6 +20,7 @@ public class Sale implements Serializable {
 	private String buyerName;
 	private String buyerContact;
 	private LocalDate saleDate;
+  private String salesRepresentative;
 
 	/**
 	 * Constructor for the Sale class
@@ -29,12 +30,14 @@ public class Sale implements Serializable {
 	 * @param buyerName - the name of the buyer
 	 * @param buyerContact - the contact information of the buyer
 	 * @param saleDate - the date when the sale was completed
+   * @param salesRepresentative - the date when the sale was completed
 	 */
-	public Sale(Vehicle vehicle, String buyerName, String buyerContact, LocalDate saleDate) {
+	public Sale(Vehicle vehicle, String buyerName, String buyerContact, LocalDate saleDate, String salesRepresentative) {
 		this.vehicle = vehicle;
 		this.buyerName = buyerName;
 		this.buyerContact = buyerContact;
 		this.saleDate = saleDate;
+    this.salesRepresentative = salesRepresentative;
 	}
 
 	/**
@@ -108,4 +111,23 @@ public class Sale implements Serializable {
 	public void setSaleDate(LocalDate saleDate) {
 		this.saleDate = saleDate;
 	}
+
+    /**
+   * Getter method for the sales representative.
+   *
+   * @return the salesperson who made the sale
+   */
+    public String getSalesRepresentative() {
+      return salesRepresentative;
+  }
+
+  /**
+   * Setter method for the sales representative.
+   *
+   * @param salesRepresentative - the new salesperson to set
+   */
+  public void setSalesRepresentative(String salesRepresentative) {
+      this.salesRepresentative = salesRepresentative;
+  }
+
 }

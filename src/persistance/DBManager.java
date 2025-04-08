@@ -70,41 +70,37 @@ public class DBManager {
 		return stmt.executeQuery();
 	}
 
-
-
-
-  public static String getSalespersonPerformanceReport() {
+  public static String getSalesRepresentativeReport() {
     StringBuilder report = new StringBuilder();
     report.append("Salesperson Performance (Last 12 Months)\n\n");
 
     String sql = """
         SELECT
-            u.name AS salesperson_name,
-            COUNT(s.sale_id) AS vehicles_sold,
-            SUM(v.price) AS total_revenue,
-            AVG(v.price) AS avg_price
+            s.sales_representative,
+            COUNT(s.sale_id) AS num_sales,
+            SUM(s.price) AS total_revenue
         FROM Sales s
-        JOIN users u ON s.user_id = u.user_id
-        JOIN Vehicle v ON s.vehicle_id = v.vehicle_id
         WHERE s.sale_date >= date('now', '-12 months')
-        GROUP BY s.user_id
+          AND s.sales_representative IS NOT NULL
+          AND s.sales_representative <> ''
+        GROUP BY s.sales_representative
         ORDER BY total_revenue DESC;
     """;
 
     try {
         ResultSet rs = getInstance().runQuery(sql);
         while (rs.next()) {
-            String name = rs.getString("salesperson_name");
-            int sold = rs.getInt("vehicles_sold");
-            double revenue = rs.getDouble("total_revenue");
-            double avg = rs.getDouble("avg_price");
-
-            report.append(name).append("\n")
-                  .append("---------------------\n")
-                  .append("Total Vehicles Sold: ").append(sold).append("\n")
-                  .append(String.format("Total Revenue: $%,.2f\n", revenue))
-                  .append(String.format("Average Sale: $%,.2f\n", avg))
-                  .append("\n");
+            String salesRep = rs.getString("sales_representative");
+            int numSales = rs.getInt("num_sales");
+            double totalRevenue = rs.getDouble("total_revenue");
+            report.append(salesRep)
+                  .append("\n")
+                  .append("Number of Sales: ")
+                  .append(numSales)
+                  .append("\n")
+                  .append("Total Revenue: $")
+                  .append(String.format("%,.2f", totalRevenue))
+                  .append("\n\n");
         }
         rs.close();
     } catch (SQLException e) {
@@ -113,20 +109,19 @@ public class DBManager {
     }
 
     return report.toString();
-  }
+}
 
   public static String getModelSalesReport() {
     StringBuilder report = new StringBuilder();
-    report.append("Model Sales (Last 12 Months)\n\n");
+    report.append("Sales Performance by Brand (Last 12 Months)\n\n");
 
     String sql = """
         SELECT
-            v.make || ' ' || v.model AS full_model_name,
+            s.make AS full_model_name,
             COUNT(s.sale_id) AS units_sold
         FROM Sales s
-        JOIN Vehicle v ON s.vehicle_id = v.vehicle_id
         WHERE s.sale_date >= date('now', '-12 months')
-        GROUP BY v.make, v.model
+        GROUP BY s.make
         ORDER BY units_sold DESC;
     """;
 
@@ -191,7 +186,23 @@ public class DBManager {
 			System.out.println("Creating the DB file " + m_dbPath + " and the tables.");
 			createTables();
 		}
+    migrateSchema();
 	}
+
+  private void migrateSchema() {
+    try {
+        // Example: Attempt to add the sales_representative column.
+        // If the column already exists, this might throw an exception that you can ignore.
+        var stmt = m_connection.createStatement();
+        stmt.execute("ALTER TABLE Sales ADD COLUMN sales_representative TEXT;");
+        m_connection.commit();
+        System.out.println("Schema migration applied: Added sales_representative column.");
+    } catch (SQLException e) {
+        // Optional: You can inspect e.getMessage() to decide if it’s safe to ignore.
+        // For instance, the error might indicate that the column already exists.
+        System.out.println("Migration skipped or error occurred: " + e.getMessage());
+    }
+  }
 
 	/**
 	 * Create the database tables structure
@@ -244,14 +255,14 @@ stmt.execute(userSQL);
 		stmt.execute("CREATE TABLE IF NOT EXISTS Sales (" +
 					"sale_id INTEGER PRIMARY KEY AUTOINCREMENT, vehicle_id INTEGER NOT NULL, " +
 					"user_id INTEGER NOT NULL, buyer_name TEXT, buyer_contact TEXT, " +
-					"sale_date DATETIME DEFAULT CURRENT_TIMESTAMP, " +
+					"sale_date DATETIME DEFAULT CURRENT_TIMESTAMP, sales_representative TEXT, " +
 					"FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id), " +
 					"FOREIGN KEY (user_id) REFERENCES users(user_id))");
 		System.out.println("Creating the password_reset_requests table");
 		stmt.execute("CREATE TABLE IF NOT EXISTS password_reset_requests (" +
 					"id INTEGER PRIMARY KEY AUTOINCREMENT, " +
 					"username TEXT NOT NULL, " +
-					"request_date TEXT NOT NULL)");	
+					"request_date TEXT NOT NULL)");
 		m_connection.commit();
 	}
 

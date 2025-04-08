@@ -40,7 +40,7 @@ import java.awt.Image;
 public class Frame extends JFrame implements ActionListener {
 	private static final long serialVersionUID = -4235592661347719465L;
 	private JFrame jf1;
-	
+
 	/**
 	 * Main GUI buttons for the dealership system operations
 	 */
@@ -52,7 +52,7 @@ public class Frame extends JFrame implements ActionListener {
 	 */
 	private JTextArea textArea;
 	private JScrollPane scrollPane;
-	
+
 	/**
 	 * Menu components for file operations
 	 */
@@ -86,7 +86,7 @@ public class Frame extends JFrame implements ActionListener {
 		menuBar.add(fileMenu);
 
 		jf1.setJMenuBar(menuBar);
-		
+
 		// Load and scale icons
 		ImageIcon addIcon = new ImageIcon("src/images/add.png");
 		ImageIcon deleteIcon = new ImageIcon("src/images/delete.png");
@@ -96,46 +96,46 @@ public class Frame extends JFrame implements ActionListener {
 		ImageIcon searchIcon = new ImageIcon("src/images/search.png");
 		ImageIcon sellIcon = new ImageIcon("src/images/sell.png");
 		ImageIcon displayallIcon = new ImageIcon("src/images/displayall.png");
-		
+
 		Image addImg = addIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledAddIcon = new ImageIcon(addImg);
 
 		Image deleteImg = deleteIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledDeleteIcon = new ImageIcon(deleteImg);
-		
+
 
 		Image editImg = editIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledEditIcon = new ImageIcon(editImg);
 
 		Image historyImg = historyIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledHistoryIcon = new ImageIcon(historyImg);
-		
+
 		Image infoImg = infoIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledInfoIcon = new ImageIcon(infoImg);
 
 		Image searchImg = searchIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledSearchIcon = new ImageIcon(searchImg);
-		
+
 		Image sellImg = sellIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledSellIcon = new ImageIcon(sellImg);
 
 		Image displayallImg = displayallIcon.getImage().getScaledInstance(15, 15, Image.SCALE_SMOOTH);
 		ImageIcon scaledDisplayallIcon = new ImageIcon(displayallImg);
-		
+
 
 		// ----------jbuttons stuff------------- //
 		m_displayAllButton = new JButton("Display all", scaledDisplayallIcon);
 		m_searchCarButton = new JButton("Search car (Budget)", scaledSearchIcon);
 		m_sellVehicleButton = new JButton("Sell a vehicle", scaledSellIcon);
-		
+
 		m_addVehicleButton = new JButton("Add a vehicle", scaledAddIcon);
 		m_removeVehicleButton = new JButton("Remove a vehicle", scaledDeleteIcon);
 		m_editVehicleButton = new JButton("Edit a vehicle", scaledEditIcon);
-		
+
 		m_dealershipInfoButton = new JButton("Dealership info", scaledInfoIcon);
 		m_salesHistoryButton = new JButton("Sales history", scaledHistoryIcon);
 
-		
+
 		m_displayAllButton.setForeground(Color.decode("#E8E8E8"));
 		m_addVehicleButton.setForeground(Color.decode("#92D050"));
 		m_editVehicleButton.setForeground(Color.decode("#E8E8E8"));
@@ -159,15 +159,15 @@ public class Frame extends JFrame implements ActionListener {
 		m_searchCarButton.setBounds(300, 230, 250, 70);
 		m_sellVehicleButton.setBounds(300, 310, 250, 70);
 
-		
+
 		m_addVehicleButton.setBounds(600, 150, 250, 70);
 		m_removeVehicleButton.setBounds(600, 230, 250, 70);
 		m_editVehicleButton.setBounds(600, 310, 250, 70);
-		
-		
+
+
 		m_dealershipInfoButton.setBounds(1000, 2, 140, 25);
 		m_salesHistoryButton.setBounds(1000, 30, 140, 25);
-		
+
 
 		// ------------Labels-----------
 		jl1 = new JLabel("");

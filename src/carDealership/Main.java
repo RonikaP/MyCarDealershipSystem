@@ -269,7 +269,7 @@ public class Main {
 
 	/**
 	 * Edit the details of a car vehicle
-	 * 
+	 *
 	 * @param c - the car to be edited
 	 */
 	public static void carEdit(Car c) {
@@ -302,7 +302,7 @@ public class Main {
 
 	/**
 	 * Edit the details of a motorcycle vehicle
-	 * 
+	 *
 	 * @param m - the motorcycle to be edited
 	 */
 	public static void motorcycleEdit(Motorcycle m) {
@@ -419,7 +419,7 @@ public class Main {
 
 	/**
 	 * Create a new dealership with the specified attributes
-	 * 
+	 *
 	 * @param name - the name of the dealership
 	 * @param location - the location of the dealership
 	 * @param capacity - the inventory capacity of the dealership
@@ -437,7 +437,7 @@ public class Main {
 	/**
 	 * Save the current dealership state to a file
 	 * Persists the dealership object to save.data file
-	 * 
+	 *
 	 * @throws IOException if an I/O error occurs during saving
 	 */
 	public static void save() throws IOException {

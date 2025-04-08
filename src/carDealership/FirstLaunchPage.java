@@ -127,7 +127,13 @@ public class FirstLaunchPage extends JFrame {
 					Main.createDealership(textField.getText(), textField_2.getText(),
 							Integer.valueOf(textField_1.getText()));
 					dispose();
-					Frame myFrame = new Frame();
+					
+					// Create login frame instead of regular frame
+					javax.swing.SwingUtilities.invokeLater(() -> {
+						LoginFrame loginFrame = new LoginFrame(Main.m_dealership);
+						loginFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+						loginFrame.setVisible(true);
+					});
 				} catch (NumberFormatException ex) {
 					textField_1.setText("");
 					lblNewLabel_4.setVisible(false);

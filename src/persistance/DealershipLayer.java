@@ -76,17 +76,32 @@ public class DealershipLayer implements Serializable {
 	 * @throws SQLException if a database access error occurs
 	 */
 	public boolean existsAndSet() throws SQLException {
-		var resultSet = DBManager.getInstance().runQuery("SELECT * FROM dealerships");
-		boolean dealershipFound = false;
-
-		while (resultSet.next()) {
-			dealershipFound = true;
-			m_name = resultSet.getString("name");
-			m_location = resultSet.getString("location");
-			m_capacity = resultSet.getInt("capacity");
+		try {
+			var resultSet = DBManager.getInstance().runQuery("SELECT * FROM dealerships");
+			boolean dealershipFound = false;
+	
+			while (resultSet.next()) {
+				dealershipFound = true;
+				m_name = resultSet.getString("name");
+				m_location = resultSet.getString("location");
+				m_capacity = resultSet.getInt("capacity");
+				
+				// Check if we have any missing tables
+				try {
+					DBManager.getInstance().runQuery("SELECT * FROM users LIMIT 1");
+					DBManager.getInstance().runQuery("SELECT * FROM roles LIMIT 1");
+				} catch (SQLException e) {
+					// Tables missing - we'll create them in DBManager
+					System.out.println("Notice: Some database tables may be missing: " + e.getMessage());
+					return false;
+				}
+			}
+	
+			return dealershipFound;
+		} catch (SQLException e) {
+			System.out.println("Error checking for dealership: " + e.getMessage());
+			return false;
 		}
-
-		return dealershipFound;
 	}
 
 	/**

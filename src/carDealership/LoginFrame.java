@@ -410,39 +410,39 @@ public class LoginFrame extends JFrame {
 
             // Hardcode all buttons for Admin - First row
             searchCarButton = new JButton("Search");
-            setButtonStyle(searchCarButton, "#F09EA7", xPos, yPos);
+            setButtonStyle(searchCarButton, "#FFFFFF", xPos, yPos);
             searchCarButton.addActionListener(this);
             add(searchCarButton);
             xPos += spacing;
 
             addVehicleButton = new JButton("Add Vehicle");
-            setButtonStyle(addVehicleButton, "#F6CA94", xPos, yPos);
+            setButtonStyle(addVehicleButton, "#FFFFFF", xPos, yPos);
             addVehicleButton.addActionListener(this);
             add(addVehicleButton);
             xPos += spacing;
 
             sellVehicleButton = new JButton("Sell Vehicle");
-            setButtonStyle(sellVehicleButton, "#FAFABE", xPos, yPos);
+            setButtonStyle(sellVehicleButton, "#FFFFFF", xPos, yPos);
             sellVehicleButton.setForeground(Color.GREEN);
             sellVehicleButton.addActionListener(this);
             add(sellVehicleButton);
             xPos += spacing;
 
             removeVehicleButton = new JButton("Remove Vehicle");
-            setButtonStyle(removeVehicleButton, "#C1EBC0", xPos, yPos);
+            setButtonStyle(removeVehicleButton, "#FFFFFF", xPos, yPos);
             removeVehicleButton.setForeground(Color.RED);
             removeVehicleButton.addActionListener(this);
             add(removeVehicleButton);
             xPos += spacing;
 
             editVehicleButton = new JButton("Edit Vehicle");
-            setButtonStyle(editVehicleButton, "#C7CAFF", xPos, yPos);
+            setButtonStyle(editVehicleButton, "#FFFFFF", xPos, yPos);
             editVehicleButton.addActionListener(this);
             add(editVehicleButton);
             xPos += spacing;
 
             salesHistoryButton = new JButton("Sales History");
-            setButtonStyle(salesHistoryButton, "#CDABEB", xPos, yPos);
+            setButtonStyle(salesHistoryButton, "#FFFFFF", xPos, yPos);
             salesHistoryButton.addActionListener(this);
             add(salesHistoryButton);
             xPos += spacing;
@@ -454,25 +454,25 @@ public class LoginFrame extends JFrame {
 
             // Hardcode additional Admin-specific buttons - Second row
             createProfileButton = new JButton("Create New Profile");
-            setButtonStyle(createProfileButton, "#F6CA94", xPos, yPos, 150, buttonHeight);
+            setButtonStyle(createProfileButton, "#FFFFFF", xPos, yPos, 150, buttonHeight);
             createProfileButton.addActionListener(this);
             add(createProfileButton);
             xPos += spacing;
 
             employeeListButton = new JButton("Employee List");
-            setButtonStyle(employeeListButton, "#C7CAFF", xPos, yPos, 150, buttonHeight);
+            setButtonStyle(employeeListButton, "#FFFFFF", xPos, yPos, 150, buttonHeight);
             employeeListButton.addActionListener(this);
             add(employeeListButton);
             xPos += spacing;
 
             passwordManagementButton = new JButton("Password Management");
-            setButtonStyle(passwordManagementButton, "#F6C2F3", xPos, yPos, 150, buttonHeight);
+            setButtonStyle(passwordManagementButton, "#FFFFFF", xPos, yPos, 150, buttonHeight);
             passwordManagementButton.addActionListener(this);
             add(passwordManagementButton);
             xPos += spacing;
 
             dealershipInfoButton = new JButton("Dealership Info");
-            setButtonStyle(dealershipInfoButton, "#FFD700", xPos, yPos, 150, buttonHeight);
+            setButtonStyle(dealershipInfoButton, "#FFFFFF", xPos, yPos, 150, buttonHeight);
             dealershipInfoButton.addActionListener(this);
             add(dealershipInfoButton);
             xPos += spacing;
@@ -1202,7 +1202,7 @@ public class LoginFrame extends JFrame {
             // Conditionally add buttons based on permissions
             if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", true)) {
                 searchCarButton = new JButton("Search");
-                searchCarButton.setBackground(Color.decode("#F09EA7"));
+                searchCarButton.setBackground(Color.decode("#FFFFFF"));
                 searchCarButton.setForeground(Color.BLACK);
                 searchCarButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 searchCarButton.setOpaque(true);
@@ -1214,7 +1214,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
                 addVehicleButton = new JButton("Add Vehicle");
-                addVehicleButton.setBackground(Color.decode("#F6CA94"));
+                addVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 addVehicleButton.setForeground(Color.BLACK);
                 addVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 addVehicleButton.setOpaque(true);
@@ -1226,7 +1226,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
                 sellVehicleButton = new JButton("Sell Vehicle");
-                sellVehicleButton.setBackground(Color.decode("#FAFABE"));
+                sellVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 sellVehicleButton.setForeground(Color.GREEN);
                 sellVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 sellVehicleButton.setOpaque(true);
@@ -1238,7 +1238,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
                 removeVehicleButton = new JButton("Remove Vehicle");
-                removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
+                removeVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 removeVehicleButton.setForeground(Color.RED);
                 removeVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 removeVehicleButton.setOpaque(true);
@@ -1250,7 +1250,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("EDIT_VEHICLE", false)) {
                 editVehicleButton = new JButton("Edit Vehicle");
-                editVehicleButton.setBackground(Color.decode("#C7CAFF"));
+                editVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 editVehicleButton.setForeground(Color.BLACK);
                 editVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 editVehicleButton.setOpaque(true);
@@ -1262,7 +1262,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
                 salesHistoryButton = new JButton("Sales History");
-                salesHistoryButton.setBackground(Color.decode("#CDABEB"));
+                salesHistoryButton.setBackground(Color.decode("#FFFFFF"));
                 salesHistoryButton.setForeground(Color.BLACK);
                 salesHistoryButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 salesHistoryButton.setOpaque(true);
@@ -1275,7 +1275,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("VIEW_DEALERSHIP_INFO", false)) {
                 dealershipInfoButton = new JButton("Dealership Info");
-                dealershipInfoButton.setBackground(Color.decode("#FFD700"));
+                dealershipInfoButton.setBackground(Color.decode("#FFFFFF"));
                 dealershipInfoButton.setForeground(Color.BLACK);
                 dealershipInfoButton.setBounds(500, 120, 150, 50);
                 dealershipInfoButton.setOpaque(true);
@@ -1673,7 +1673,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
                 addVehicleButton = new JButton("Add Vehicle");
-                addVehicleButton.setBackground(Color.decode("#F6CA94"));
+                addVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 addVehicleButton.setForeground(Color.BLACK);
                 addVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 addVehicleButton.setOpaque(true);
@@ -1685,7 +1685,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
                 sellVehicleButton = new JButton("Sell Vehicle");
-                sellVehicleButton.setBackground(Color.decode("#FAFABE"));
+                sellVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 sellVehicleButton.setForeground(Color.GREEN);
                 sellVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 sellVehicleButton.setOpaque(true);
@@ -1697,7 +1697,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
                 removeVehicleButton = new JButton("Remove Vehicle");
-                removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
+                removeVehicleButton.setBackground(Color.decode("#FFFFFF"));
                 removeVehicleButton.setForeground(Color.RED);
                 removeVehicleButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 removeVehicleButton.setOpaque(true);
@@ -1709,7 +1709,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", false)) {
                 searchCarButton = new JButton("Search");
-                searchCarButton.setBackground(Color.decode("#F6C2F3"));
+                searchCarButton.setBackground(Color.decode("#FFFFFF"));
                 searchCarButton.setForeground(Color.BLACK);
                 searchCarButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 searchCarButton.setOpaque(true);
@@ -1721,7 +1721,7 @@ public class LoginFrame extends JFrame {
 
             if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
                 salesHistoryButton = new JButton("Sales History");
-                salesHistoryButton.setBackground(Color.decode("#CDABEB"));
+                salesHistoryButton.setBackground(Color.decode("#FFFFFF"));
                 salesHistoryButton.setForeground(Color.BLACK);
                 salesHistoryButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
                 salesHistoryButton.setOpaque(true);

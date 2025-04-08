@@ -31,8 +31,11 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	private DBManager() throws SQLException {
-		var fileSystem = FileSystems.getDefault();
-		m_dbPath = fileSystem.getPath(System.getProperty("user.home"), "dealership.sqlite3").toString();
+		// Option 1: Use a relative path inside the project directory
+		m_dbPath = "dealership.sqlite3";
+		
+		// Print the absolute path for debugging
+		System.out.println("Database path: " + new File(m_dbPath).getAbsolutePath());
 
 		initDB();
 	}

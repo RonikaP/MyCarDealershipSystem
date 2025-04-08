@@ -145,8 +145,9 @@ public class LoginFrame extends JFrame {
 
     public static User loadUser(String username) throws SQLException, Exception {
     DBManager db = DBManager.getInstance();
+    // Use parameterized query to avoid SQL injection and handle case sensitivity correctly
     ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
-                               "ON u.role_id = r.role_id WHERE u.username = '" + username + "'");
+                               "ON u.role_id = r.role_id WHERE LOWER(u.username) = LOWER(?)", username);
     if (rs.next()) {
         String role = rs.getString("role_name");
         String password = rs.getString("password");

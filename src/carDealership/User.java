@@ -119,7 +119,8 @@ public abstract class User {
     public boolean checkPassword(String passwordAttempt) throws Exception {
         System.out.println("Stored password: " + this.password);
         System.out.println("Attempted password: " + passwordAttempt);
-        return this.password.trim().equals(passwordAttempt);
+        // Trim both passwords to avoid whitespace issues
+        return this.password.trim().equals(passwordAttempt.trim());
     }
 
     /**

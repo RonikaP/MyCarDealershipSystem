@@ -226,31 +226,51 @@ public class LoginFrame extends JFrame {
     private void authenticateUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-        // Add your login authentication logic here
+        
         try {
             User user = loadUser(username);
-            if (user != null && user.checkPassword(password) && user.isActive()) {
+            if (user == null) {
+                // User not found
+                statusLabel.setText("Username not found");
+                statusLabel.setForeground(Color.RED);
+                return;
+            }
+            
+            // Check if account is active (non-admin users only)
+            if (!(user instanceof Admin) && !user.isActive()) {
+                statusLabel.setText("Account is inactive. Contact an administrator.");
+                statusLabel.setForeground(Color.RED);
+                return;
+            }
+            
+            // Verify password
+            if (user.checkPassword(password)) {
                 // Login successful, check if user needs to change password
                 if (user.isTempPassword()) {
                     forcePasswordChange(user);
                 } else {
                     // Login successful, no password change needed
+                    statusLabel.setText("Login successful!");
+                    statusLabel.setForeground(Color.GREEN);
                     loginSuccessful(user);
                 }
             } else {
-                // Login failed, display error message
-                if (user != null && !user.isActive()) {
-                    System.out.println("Your account is inactive. Please contact an administrator.");
-                } else {
-                    System.out.println("Login failed");
-                }
+                // Incorrect password
+                statusLabel.setText("Invalid password");
+                statusLabel.setForeground(Color.RED);
             }
         } catch (SQLException e) {
             // Handle SQLException
-            System.out.println("A SQL error occurred: " + e.getMessage());
+            statusLabel.setText("Database error: " + e.getMessage());
+            statusLabel.setForeground(Color.RED);
+            System.out.println("SQL Error: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
             // Handle other exceptions
-            System.out.println("An error occurred: " + e.getMessage());
+            statusLabel.setText("Error: " + e.getMessage());
+            statusLabel.setForeground(Color.RED);
+            System.out.println("Error: " + e.getMessage());
+            e.printStackTrace();
         }
     }
     private void loginSuccessful(User user) {

@@ -212,9 +212,10 @@ public class DBManager {
 		var userSQL = "CREATE TABLE IF NOT EXISTS users (user_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
               "username TEXT UNIQUE NOT NULL, password TEXT NOT NULL, role_id INTEGER, " +
               "name TEXT NOT NULL, email TEXT, phone TEXT, is_active BOOLEAN DEFAULT TRUE, " +
-              "join_date DATE DEFAULT CURRENT_DATE, FOREIGN KEY (role_id) REFERENCES roles(role_id));";
+              "join_date DATE DEFAULT CURRENT_DATE, failedattempts INTEGER DEFAULT 0, " +
+              "FOREIGN KEY (role_id) REFERENCES roles(role_id));";
 
-		stmt.execute(userSQL);
+stmt.execute(userSQL);
 
 		// Modified roles table schema
 		var roleSQL = "CREATE TABLE IF NOT EXISTS roles (role_id INTEGER PRIMARY KEY AUTOINCREMENT,"

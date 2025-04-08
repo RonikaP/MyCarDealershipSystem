@@ -60,27 +60,27 @@ public class LoginFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 650, 400);
         setLayout(null);
-
+    
         JLabel usernameLabel = new JLabel("Username:");
         usernameLabel.setBounds(200, 100, 100, 25);
         add(usernameLabel);
-
+    
         usernameField = new JTextField();
         usernameField.setBounds(300, 100, 150, 25);
         add(usernameField);
-
+    
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(200, 150, 100, 25);
         add(passwordLabel);
-
+    
         passwordField = new JPasswordField();
         passwordField.setBounds(300, 150, 150, 25);
         add(passwordField);
-
+    
         loginButton = new JButton("Login");
         loginButton.setBounds(300, 200, 100, 30);
         add(loginButton);
-
+    
         // 🔹 Forgot Password Button
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         int buttonWidth = 150;
@@ -90,17 +90,16 @@ public class LoginFrame extends JFrame {
         int yPos = 240; // Keep the same vertical position
         forgotPasswordButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
         add(forgotPasswordButton);
-
-
+    
         statusLabel = new JLabel("");
-        statusLabel.setBounds(200, 250, 250, 25);
+        statusLabel.setBounds(200, 280, 250, 25); // Adjusted y from 250 to 280
         add(statusLabel);
-
+    
         loginButton.addActionListener(e -> authenticateUser());
-
+    
         // 🔹 Add action listener for forgot password
         forgotPasswordButton.addActionListener(e -> handleForgotPassword());
-
+    
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -171,20 +170,21 @@ public class LoginFrame extends JFrame {
             boolean isActive = rawIsActive == 1;
             System.out.println("Raw is_active from DB for " + username + ": " + rawIsActive);
             System.out.println("Computed isActive: " + isActive);
+            int failedAttempts = rs.getInt("failed_attempts");
 
             switch (role) {
                 case "Admin":
                     return new Admin(rs.getInt("user_id"), rs.getString("username"), password,
                                  rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                 isTempPassword, isActive);
+                                 isTempPassword, isActive,failedAttempts);
                 case "Manager":
                     return new Manager(rs.getInt("user_id"), rs.getString("username"), password,
                                    rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                   isTempPassword, isActive);
+                                   isTempPassword, isActive, failedAttempts);
                 case "Salesperson":
                     return new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
                                        rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                       isTempPassword, isActive);
+                                       isTempPassword, isActive, failedAttempts);
                 default:
                     throw new SQLException("Unknown role: " + role);
             }
@@ -252,31 +252,63 @@ public class LoginFrame extends JFrame {
     private void authenticateUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-        // Add your login authentication logic here
+        
         try {
-            User user = loadUser(username);
-            if (user != null && user.checkPassword(password) && user.isActive()) {
+            User user = User.loadUser(username); // Use the static method from User class
+            if (user == null) {
+                statusLabel.setText("User not found.");
+                statusLabel.setForeground(Color.RED);
+                return;
+            }
+        
+            // Check if account is locked due to too many failed attempts
+            if (user.getFailedAttempts() >= 3) {
+                if (!user.isActive()) {
+                    statusLabel.setText("Your account is inactive. Please contact an administrator.");
+                    statusLabel.setForeground(Color.RED);
+                } else {
+                    // Deactivate account if it somehow reached 3 attempts but is still active
+                    user.setActive(false);
+                    dealership.updateUser(user); // Update the DB
+                    statusLabel.setText("Too many failed attempts. Account deactivated.");
+                    statusLabel.setForeground(Color.RED);
+                }
+                return;
+            }
+        
+            // Check password and active status
+            if (user.checkPassword(password) && user.isActive()) {
+                // Reset failed attempts on successful login
+                user.setFailedAttempts(0);
+                dealership.updateUser(user); // Update the DB
                 // Login successful, check if user needs to change password
                 if (user.isTempPassword()) {
                     forcePasswordChange(user);
                 } else {
-                    // Login successful, no password change needed
                     loginSuccessful(user);
                 }
             } else {
-                // Login failed, display error message
-                if (user != null && !user.isActive()) {
-                    System.out.println("Your account is inactive. Please contact an administrator.");
+                // Login failed, increment failed attempts
+                int newAttempts = user.getFailedAttempts() + 1;
+                user.setFailedAttempts(newAttempts);
+                dealership.updateUser(user); // Update the DB
+                
+                if (newAttempts >= 3) {
+                    user.setActive(false);
+                    dealership.updateUser(user); // Update the DB
+                    statusLabel.setText("Too many failed attempts. Account deactivated.");
+                    statusLabel.setForeground(Color.RED);
                 } else {
-                    System.out.println("Login failed");
+                    statusLabel.setText("Incorrect password. Attempts left: " + (3 - newAttempts));
+                    statusLabel.setForeground(Color.RED);
                 }
             }
         } catch (SQLException e) {
-            // Handle SQLException
-            System.out.println("A SQL error occurred: " + e.getMessage());
+            statusLabel.setText("A SQL error occurred: " + e.getMessage());
+            statusLabel.setForeground(Color.RED);
         } catch (Exception e) {
-            // Handle other exceptions
-            System.out.println("An error occurred: " + e.getMessage());
+            statusLabel.setText("An error occurred: " + e.getMessage());
+            statusLabel.setForeground(Color.RED);
         }
     }
 
@@ -880,11 +912,19 @@ public class LoginFrame extends JFrame {
             if (username == null) return;
             User targetUser = User.loadUser(username);
             if (targetUser != null) {
-                targetUser.setActive(!targetUser.isActive()); // Toggle the active status
-                System.out.println("After toggle: isActive = " + targetUser.isActive());
-                dealership.updateUser(targetUser);
+                boolean newStatus = !targetUser.isActive();
+                targetUser.setActive(newStatus); // Toggle the active status
+                if (newStatus) { // If reactivating, reset failed attempts
+                    targetUser.setFailedAttempts(0);
+                }
+                System.out.println("After toggle in memory: isActive = " + targetUser.isActive() + ", failedAttempts = " + targetUser.getFailedAttempts());
+                dealership.updateUser(targetUser); // Update the DB
                 
-                JOptionPane.showMessageDialog(this, "User " + username + " is now " + (targetUser.isActive() ? "active" : "inactive"));
+                // Verify database update
+                User refreshedUser = User.loadUser(username); // Reload from DB
+                System.out.println("After DB update, reloaded isActive = " + refreshedUser.isActive() + ", failedAttempts = " + refreshedUser.getFailedAttempts());
+                
+                JOptionPane.showMessageDialog(this, "User " + username + " is now " + (refreshedUser.isActive() ? "active" : "inactive"));
             } else {
                 JOptionPane.showMessageDialog(this, "User not found!");
             }

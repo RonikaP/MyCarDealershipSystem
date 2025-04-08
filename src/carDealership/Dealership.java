@@ -364,19 +364,20 @@ public class Dealership implements Serializable {
             String password = rs.getString("password");
             boolean isTempPassword = rs.getInt("is_temp_password") == 1;
             boolean isActive = rs.getInt("is_active") == 1;
+            int failedAttempts = rs.getInt("failed_attempts");
 
             switch (role) {
                 case "Admin":
                     users.add(new Admin(rs.getInt("user_id"), rs.getString("username"), password,
-                            rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+                        rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive, failedAttempts));
                     break;
                 case "Manager":
                     users.add(new Manager(rs.getInt("user_id"), rs.getString("username"), password,
-                            rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+                            rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive, failedAttempts));
                     break;
                 case "Salesperson":
                     users.add(new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
-                            rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive));
+                            rs.getString("name"), rs.getString("email"), rs.getString("phone"), isTempPassword, isActive, failedAttempts));
                     break;
             }
         }
@@ -391,8 +392,8 @@ public class Dealership implements Serializable {
      */
     public void updateUser(User user) throws SQLException {
         DBManager db = DBManager.getInstance();
-        String query = "UPDATE users SET password = ?, name = ?, email = ?, phone = ?, is_active = ? WHERE user_id = ?";
-        db.runUpdate(query, user.password, user.name, user.email, user.phone, user.isActive ? 1 : 0, user.getId());
+        String query = "UPDATE users SET password = ?, name = ?, email = ?, phone = ?, is_active = ?, failed_attempts = ? WHERE user_id = ?";
+        db.runUpdate(query, user.password, user.name, user.email, user.phone, user.isActive ? 1 : 0, user.getFailedAttempts(), user.getId());
     }
 
     public void addPasswordResetRequest(User user) throws SQLException {

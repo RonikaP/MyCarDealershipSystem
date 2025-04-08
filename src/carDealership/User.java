@@ -31,6 +31,7 @@ public abstract class User {
     protected boolean isActive;
     protected String joinDate;
     protected boolean isTempPassword;
+    protected int failedAttempts; // Added DB column
     protected Map<String, Boolean> permissions; // Dynamic permissions
     
     /**
@@ -237,6 +238,29 @@ public abstract class User {
         db.runUpdate(query);
     }
 
+    // Add getter and setter for failedAttempts
+    public int getFailedAttempts() {
+        return failedAttempts;
+    }
+
+    public void setFailedAttempts(int failedAttempts) {
+        this.failedAttempts = failedAttempts;
+        try {
+            updateFailedAttemptsInDB(); // Update DB when set
+        } catch (SQLException e) {
+            System.err.println("Error updating failed attempts: " + e.getMessage());
+        }
+    }
+
+    // New method to update failed_attempts in the database
+    private void updateFailedAttemptsInDB() throws SQLException {
+        DBManager db = DBManager.getInstance();
+        String query = "UPDATE users SET failed_attempts = " + this.failedAttempts + " WHERE user_id = " + this.id;
+        db.runUpdate(query);
+    }
+
+
+
     /**
      * Load a user from the database by username
      * Creates and returns the appropriate user subclass instance based on role
@@ -246,6 +270,7 @@ public abstract class User {
      * @throws SQLException if a database error occurs
      * @throws Exception for other errors
      */
+    // Update loadUser to fetch failed_attempts
     public static User loadUser(String username) throws SQLException, Exception {
         DBManager db = DBManager.getInstance();
         ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
@@ -254,21 +279,22 @@ public abstract class User {
             String role = rs.getString("role_name");
             String password = rs.getString("password");
             boolean isTempPassword = rs.getInt("is_temp_password") == 1;
-            boolean isActive = rs.getInt("is_active") == 1; // Fetch is_active from DB
-    
+            boolean isActive = rs.getInt("is_active") == 1;
+            int failedAttempts = rs.getInt("failed_attempts"); // Fetch failed_attempts
+
             switch (role) {
                 case "Admin":
                     return new Admin(rs.getInt("user_id"), rs.getString("username"), password,
                                      rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                     isTempPassword, isActive);
+                                     isTempPassword, isActive, failedAttempts);
                 case "Manager":
                     return new Manager(rs.getInt("user_id"), rs.getString("username"), password,
                                        rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                       isTempPassword, isActive);
+                                       isTempPassword, isActive, failedAttempts);
                 case "Salesperson":
                     return new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
                                            rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                           isTempPassword, isActive);
+                                           isTempPassword, isActive, failedAttempts);
                 default:
                     throw new SQLException("Unknown role: " + role);
             }
@@ -299,8 +325,9 @@ class Admin extends User {
      * @param isActive - whether the admin account is active
      */
     public Admin(int id, String username, String password, String name, String email, String phone,
-                 boolean isTempPassword, boolean isActive) {
+                 boolean isTempPassword, boolean isActive, int failedAttempts) {
         super(id, username, password, name, email, phone, "Admin", isActive, LocalDate.now().toString(), isTempPassword);
+        this.failedAttempts = failedAttempts; // Set failedAttempts
     }
 
     /**
@@ -374,8 +401,9 @@ class Manager extends User {
      * @param isActive - whether the manager account is active
      */
     public Manager(int id, String username, String password, String name, String email, String phone,
-                   boolean isTempPassword, boolean isActive) {
+                   boolean isTempPassword, boolean isActive, int failedAttempts) {
         super(id, username, password, name, email, phone, "Manager", isActive, LocalDate.now().toString(), isTempPassword);
+        this.failedAttempts = failedAttempts;
     }
 }
 
@@ -400,7 +428,9 @@ class Salesperson extends User {
      * @param isTempPassword - whether the password is temporary and requires changing
      * @param isActive - whether the salesperson account is active
      */
-    public Salesperson(int id, String username, String password, String name, String email, String phone, boolean isTempPassword, boolean isActive) {
-        super(id, username, password, name, email, phone, "Salesperson", isActive, LocalDate.now().toString() , isTempPassword);
+    public Salesperson(int id, String username, String password, String name, String email, String phone,
+                       boolean isTempPassword, boolean isActive, int failedAttempts) {
+        super(id, username, password, name, email, phone, "Salesperson", isActive, LocalDate.now().toString(), isTempPassword);
+        this.failedAttempts = failedAttempts;
     }
 }

@@ -143,20 +143,11 @@ public class LoginFrame extends JFrame {
 
 
 
-    public static User loadUser(String username) throws SQLException, Exception {
-    DBManager db = DBManager.getInstance();
-    // Use parameterized query to avoid SQL injection and handle case sensitivity correctly
-    ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
-                               "ON u.role_id = r.role_id WHERE LOWER(u.username) = LOWER(?)", username);
-    if (rs.next()) {
-        String role = rs.getString("role_name");
-        String password = rs.getString("password");
-        boolean isTempPassword = rs.getInt("is_temp_password") == 1;
-        int rawIsActive = rs.getInt("is_active"); // Get raw value
-        boolean isActive = rawIsActive == 1;
-        System.out.println("Raw is_active from DB for " + username + ": " + rawIsActive);
-        System.out.println("Computed isActive: " + isActive);
-
+    /**
+     * Helper method to create appropriate user subclass from the role
+     */
+    private static User createUserFromRole(ResultSet rs, String role, String password, 
+                                          boolean isTempPassword, boolean isActive) throws SQLException {
         switch (role) {
             case "Admin":
                 return new Admin(rs.getInt("user_id"), rs.getString("username"), password,
@@ -164,16 +155,79 @@ public class LoginFrame extends JFrame {
                                  isTempPassword, isActive);
             case "Manager":
                 return new Manager(rs.getInt("user_id"), rs.getString("username"), password,
-                                   rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                   isTempPassword, isActive);
+                                  rs.getString("name"), rs.getString("email"), rs.getString("phone"),
+                                  isTempPassword, isActive);
             case "Salesperson":
                 return new Salesperson(rs.getInt("user_id"), rs.getString("username"), password,
-                                       rs.getString("name"), rs.getString("email"), rs.getString("phone"),
-                                       isTempPassword, isActive);
+                                      rs.getString("name"), rs.getString("email"), rs.getString("phone"),
+                                      isTempPassword, isActive);
             default:
                 throw new SQLException("Unknown role: " + role);
         }
     }
+
+    public static User loadUser(String username) throws SQLException, Exception {
+    DBManager db = DBManager.getInstance();
+    // First check if the roles table exists
+    try {
+        db.runQuery("SELECT * FROM roles LIMIT 1");
+        System.out.println("Roles table exists");
+    } catch (SQLException e) {
+        System.out.println("Roles table doesn't exist: " + e.getMessage());
+        // Create roles table if it doesn't exist
+        try {
+            db.runUpdate("CREATE TABLE IF NOT EXISTS roles (role_id INTEGER PRIMARY KEY, role_name TEXT NOT NULL)");
+            db.runUpdate("INSERT INTO roles (role_id, role_name) VALUES (1, 'Admin')");
+            db.runUpdate("INSERT INTO roles (role_id, role_name) VALUES (2, 'Manager')");
+            db.runUpdate("INSERT INTO roles (role_id, role_name) VALUES (3, 'Salesperson')");
+            System.out.println("Created roles table with default values");
+        } catch (SQLException e2) {
+            System.out.println("Failed to create roles table: " + e2.getMessage());
+        }
+    }
+    
+    // Try first with JOIN
+    try {
+        ResultSet rs = db.runQuery("SELECT u.*, r.role_name FROM users u JOIN roles r " +
+                                  "ON u.role_id = r.role_id WHERE LOWER(u.username) = LOWER(?)", username);
+        if (rs.next()) {
+            // Join query worked
+            String role = rs.getString("role_name");
+            String password = rs.getString("password");
+            boolean isTempPassword = rs.getInt("is_temp_password") == 1;
+            int rawIsActive = rs.getInt("is_active"); // Get raw value
+            boolean isActive = rawIsActive == 1;
+            System.out.println("Raw is_active from DB for " + username + ": " + rawIsActive);
+            System.out.println("Computed isActive: " + isActive);
+            
+            return createUserFromRole(rs, role, password, isTempPassword, isActive);
+        }
+    } catch (SQLException e) {
+        System.out.println("Join query failed: " + e.getMessage());
+    }
+    
+    // Fallback to direct query without join
+    System.out.println("Trying direct query without join...");
+    ResultSet rs = db.runQuery("SELECT * FROM users WHERE LOWER(username) = LOWER(?)", username);
+    if (rs.next()) {
+        String password = rs.getString("password");
+        boolean isTempPassword = rs.getInt("is_temp_password") == 1;
+        int rawIsActive = rs.getInt("is_active");
+        boolean isActive = rawIsActive == 1;
+        int roleId = rs.getInt("role_id");
+        System.out.println("User found. Role ID: " + roleId);
+        
+        // Determine role based on role_id
+        String role;
+        if (roleId == 1) role = "Admin";
+        else if (roleId == 2) role = "Manager";
+        else role = "Salesperson";
+        
+        System.out.println("Using role: " + role);
+        return createUserFromRole(rs, role, password, isTempPassword, isActive);
+    }
+    
+    // No user found
     return null;
 }
 

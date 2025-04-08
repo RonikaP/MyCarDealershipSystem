@@ -60,27 +60,27 @@ public class LoginFrame extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setBounds(100, 100, 650, 400);
         setLayout(null);
-    
+
         JLabel usernameLabel = new JLabel("Username:");
         usernameLabel.setBounds(200, 100, 100, 25);
         add(usernameLabel);
-    
+
         usernameField = new JTextField();
         usernameField.setBounds(300, 100, 150, 25);
         add(usernameField);
-    
+
         JLabel passwordLabel = new JLabel("Password:");
         passwordLabel.setBounds(200, 150, 100, 25);
         add(passwordLabel);
-    
+
         passwordField = new JPasswordField();
         passwordField.setBounds(300, 150, 150, 25);
         add(passwordField);
-    
+
         loginButton = new JButton("Login");
         loginButton.setBounds(300, 200, 100, 30);
         add(loginButton);
-    
+
         // 🔹 Forgot Password Button
         JButton forgotPasswordButton = new JButton("Forgot Password?");
         int buttonWidth = 150;
@@ -90,16 +90,16 @@ public class LoginFrame extends JFrame {
         int yPos = 240; // Keep the same vertical position
         forgotPasswordButton.setBounds(xPos, yPos, buttonWidth, buttonHeight);
         add(forgotPasswordButton);
-    
+
         statusLabel = new JLabel("");
         statusLabel.setBounds(200, 280, 250, 25); // Adjusted y from 250 to 280
         add(statusLabel);
-    
+
         loginButton.addActionListener(e -> authenticateUser());
-    
+
         // 🔹 Add action listener for forgot password
         forgotPasswordButton.addActionListener(e -> handleForgotPassword());
-    
+
         setLocationRelativeTo(null);
         setVisible(true);
     }
@@ -109,12 +109,12 @@ public class LoginFrame extends JFrame {
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Did you forget your password? Send a request to the admin."));
         panel.add(new JLabel("Enter your username:"));
-    
+
         // Add a smaller text field for username input
         JTextField usernameInput = new JTextField();
         usernameInput.setPreferredSize(new Dimension(100, 25)); // Smaller square field
         panel.add(usernameInput);
-    
+
         int choice = JOptionPane.showOptionDialog(this,
             panel,
             "Forgot Password",
@@ -123,7 +123,7 @@ public class LoginFrame extends JFrame {
             null,
             null,
             null);
-    
+
         if (choice == JOptionPane.OK_OPTION) {
             String username = usernameInput.getText().trim();
             if (!username.isEmpty()) {
@@ -252,7 +252,7 @@ public class LoginFrame extends JFrame {
     private void authenticateUser() {
         String username = usernameField.getText();
         String password = new String(passwordField.getPassword());
-        
+
         try {
             User user = User.loadUser(username); // Use the static method from User class
             if (user == null) {
@@ -260,7 +260,7 @@ public class LoginFrame extends JFrame {
                 statusLabel.setForeground(Color.RED);
                 return;
             }
-        
+
             // Check if account is locked due to too many failed attempts
             if (user.getFailedAttempts() >= 3) {
                 if (!user.isActive()) {
@@ -275,7 +275,7 @@ public class LoginFrame extends JFrame {
                 }
                 return;
             }
-        
+
             // Check password and active status
             if (user.checkPassword(password) && user.isActive()) {
                 // Reset failed attempts on successful login
@@ -292,7 +292,7 @@ public class LoginFrame extends JFrame {
                 int newAttempts = user.getFailedAttempts() + 1;
                 user.setFailedAttempts(newAttempts);
                 dealership.updateUser(user); // Update the DB
-                
+
                 if (newAttempts >= 3) {
                     user.setActive(false);
                     dealership.updateUser(user); // Update the DB
@@ -314,17 +314,17 @@ public class LoginFrame extends JFrame {
 
     /**
      * Handle successful login process
-     * 
+     *
      * @param user - the authenticated user
      */
     private void loginSuccessful(User user) {
         dispose(); // Close the login frame
         openDashboard(user);
     }
-    
+
     /**
      * Open the appropriate dashboard based on user role
-     * 
+     *
      * @param user - the authenticated user
      */
     private void openDashboard(User user) {
@@ -356,7 +356,7 @@ public class LoginFrame extends JFrame {
         private JMenu fileMenu;
         private JMenuItem saveItem, deleteDealershipItem;
         private JButton logoutButton = new JButton("Logout");
-        
+
         /**
          * Constructor for the AdminDashboard class
          *
@@ -374,7 +374,7 @@ public class LoginFrame extends JFrame {
             initializeUI();
             setLocationRelativeTo(null);
         }
-    
+
         /**
          * Initialize the admin dashboard UI components
          * Sets up buttons and menu items for all administrative functions
@@ -382,8 +382,8 @@ public class LoginFrame extends JFrame {
         private void initializeUI() {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Admin");
             welcomeLabel.setBounds(20, 10, 300, 25);
-            add(welcomeLabel); 
-        
+            add(welcomeLabel);
+
             // Create menu bar
             menuBar = new JMenuBar();
             fileMenu = new JMenu("File");
@@ -392,7 +392,7 @@ public class LoginFrame extends JFrame {
             fileMenu.add(saveItem);
             fileMenu.add(deleteDealershipItem);
             menuBar.add(fileMenu);
-        
+
             // Add horizontal glue to push the logout button to the right
             menuBar.add(Box.createHorizontalGlue());
             // Create logout button and add it to the menu bar
@@ -400,88 +400,88 @@ public class LoginFrame extends JFrame {
             logoutButton.addActionListener(e -> handleLogout());
             menuBar.add(logoutButton);
             setJMenuBar(menuBar);
-        
+
             // Variables to track button positions dynamically
             int xPos = 20;
             int yPos = 40;
             int buttonWidth = 150;
             int buttonHeight = 70;
             int spacing = 160;
-        
+
             // Hardcode all buttons for Admin - First row
             searchCarButton = new JButton("Search");
             setButtonStyle(searchCarButton, "#F09EA7", xPos, yPos);
             searchCarButton.addActionListener(this);
             add(searchCarButton);
             xPos += spacing;
-        
+
             addVehicleButton = new JButton("Add Vehicle");
             setButtonStyle(addVehicleButton, "#F6CA94", xPos, yPos);
             addVehicleButton.addActionListener(this);
             add(addVehicleButton);
             xPos += spacing;
-        
+
             sellVehicleButton = new JButton("Sell Vehicle");
             setButtonStyle(sellVehicleButton, "#FAFABE", xPos, yPos);
             sellVehicleButton.setForeground(Color.GREEN);
             sellVehicleButton.addActionListener(this);
             add(sellVehicleButton);
             xPos += spacing;
-        
+
             removeVehicleButton = new JButton("Remove Vehicle");
             setButtonStyle(removeVehicleButton, "#C1EBC0", xPos, yPos);
             removeVehicleButton.setForeground(Color.RED);
             removeVehicleButton.addActionListener(this);
             add(removeVehicleButton);
             xPos += spacing;
-        
+
             editVehicleButton = new JButton("Edit Vehicle");
             setButtonStyle(editVehicleButton, "#C7CAFF", xPos, yPos);
             editVehicleButton.addActionListener(this);
             add(editVehicleButton);
             xPos += spacing;
-        
+
             salesHistoryButton = new JButton("Sales History");
             setButtonStyle(salesHistoryButton, "#CDABEB", xPos, yPos);
             salesHistoryButton.addActionListener(this);
             add(salesHistoryButton);
             xPos += spacing;
-        
+
             // Reset xPos for second row
             xPos = 180;
             yPos = 120;
             buttonHeight = 50;
-        
+
             // Hardcode additional Admin-specific buttons - Second row
             createProfileButton = new JButton("Create New Profile");
             setButtonStyle(createProfileButton, "#F6CA94", xPos, yPos, 150, buttonHeight);
             createProfileButton.addActionListener(this);
             add(createProfileButton);
             xPos += spacing;
-        
+
             employeeListButton = new JButton("Employee List");
             setButtonStyle(employeeListButton, "#C7CAFF", xPos, yPos, 150, buttonHeight);
             employeeListButton.addActionListener(this);
             add(employeeListButton);
             xPos += spacing;
-        
+
             passwordManagementButton = new JButton("Password Management");
             setButtonStyle(passwordManagementButton, "#F6C2F3", xPos, yPos, 150, buttonHeight);
             passwordManagementButton.addActionListener(this);
             add(passwordManagementButton);
             xPos += spacing;
-        
+
             dealershipInfoButton = new JButton("Dealership Info");
             setButtonStyle(dealershipInfoButton, "#FFD700", xPos, yPos, 150, buttonHeight);
             dealershipInfoButton.addActionListener(this);
             add(dealershipInfoButton);
             xPos += spacing;
-        
+
             // Add action listeners for menu items
             saveItem.addActionListener(this);
             deleteDealershipItem.addActionListener(this);
         }
-    
+
         /**
          * Handle action events from admin dashboard components
          *
@@ -501,50 +501,50 @@ public class LoginFrame extends JFrame {
                         JPanel filterPanel = new JPanel(new GridLayout(0, 2));
                         JTextField makeField = new JTextField();
                         JTextField modelField = new JTextField();
-                        
+
                         JSlider minYearSlider = new JSlider(2000, 2025, 2000);
                         JSlider maxPriceSlider = new JSlider(0, 1000000, 1000000); // Increased range and default
                         JLabel minYearLabel = new JLabel("2000", SwingConstants.CENTER);
                         JLabel maxPriceLabel = new JLabel("$1000000", SwingConstants.CENTER);
-                
+
                         minYearSlider.setMajorTickSpacing(5);
                         minYearSlider.setPaintTicks(true);
                         minYearSlider.setPaintLabels(true);
                         minYearSlider.addChangeListener(ev -> minYearLabel.setText(String.valueOf(minYearSlider.getValue())));
-                        
+
                         Hashtable<Integer, JLabel> yearLabels = new Hashtable<>();
                         yearLabels.put(2000, new JLabel("2000"));
                         yearLabels.put(2025, new JLabel("2025"));
                         minYearSlider.setLabelTable(yearLabels);
-                
+
                         maxPriceSlider.setMajorTickSpacing(200000);
                         maxPriceSlider.setPaintTicks(true);
                         maxPriceSlider.setPaintLabels(true);
                         maxPriceSlider.addChangeListener(ev -> maxPriceLabel.setText(String.valueOf(maxPriceSlider.getValue())));
-                
+
                         Hashtable<Integer, JLabel> priceLabels = new Hashtable<>();
                         priceLabels.put(0, new JLabel("$0"));
                         priceLabels.put(1000000, new JLabel("$1M"));
                         maxPriceSlider.setLabelTable(priceLabels);
-                
+
                         filterPanel.add(new JLabel("Make (optional):")); filterPanel.add(makeField);
                         filterPanel.add(new JLabel("Model (optional):")); filterPanel.add(modelField);
                         filterPanel.add(new JLabel("Min Year:")); filterPanel.add(minYearSlider);
                         filterPanel.add(new JLabel("   Selected Year:")); filterPanel.add(minYearLabel);
                         filterPanel.add(new JLabel("Max Price:")); filterPanel.add(maxPriceSlider);
                         filterPanel.add(new JLabel("   Selected Price:")); filterPanel.add(maxPriceLabel);
-                
+
                         String[] options = {"Search", "Cancel", "Display All"};
                         int result = JOptionPane.showOptionDialog(this, filterPanel, "Search Inventory",
                                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null,
                                 options, options[0]);
-                
+
                         if (result == 0) { // "Search" clicked
                             String make = makeField.getText().trim().isEmpty() ? null : makeField.getText().trim();
                             String model = modelField.getText().trim().isEmpty() ? null : modelField.getText().trim();
                             int minYear = minYearSlider.getValue();
                             double maxPrice = maxPriceSlider.getValue();
-                
+
                             String filteredResult = filterInventory(make, model, minYear, maxPrice);
                             showResults(filteredResult);
                         } else if (result == 2) { // "Display All" clicked
@@ -613,7 +613,7 @@ public class LoginFrame extends JFrame {
                     JTextField typeField = new JTextField();
                     JTextField handlebarField = new JTextField();
                     JPanel editPanel = new JPanel(new GridLayout(0, 2));
-    
+
                     if (vehicle instanceof Car) {
                         Car car = (Car) vehicle;
                         editPanel.add(new JLabel("Make:")); makeField.setText(car.getMake()); editPanel.add(makeField);
@@ -744,19 +744,19 @@ public class LoginFrame extends JFrame {
             for (Vehicle vehicle : dealership.getVehicles()) {
                 if (vehicle == null) continue;
                 boolean matches = true;
-    
+
                 if (make != null && !vehicle.getMake().equalsIgnoreCase(make)) matches = false;
                 if (model != null && !vehicle.getModel().equalsIgnoreCase(model)) matches = false;
                 if (minYear != null && vehicle.getYear() < minYear) matches = false;
                 if (maxPrice != null && vehicle.getPrice() > maxPrice) matches = false;
-    
+
                 if (matches) {
                     result.append(vehicle.toString()).append("\n--------------------\n");
                 }
             }
             return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
         }
-    
+
         /**
          * Create a new user profile
          * Only accessible by admin users
@@ -776,13 +776,13 @@ public class LoginFrame extends JFrame {
             String[] roles = {"Admin", "Manager", "Salesperson"};
             JComboBox<String> roleCombo = new JComboBox<>(roles);
             JTextField usernameField = new JTextField();
-    
+
             panel.add(new JLabel("Name:")); panel.add(nameField);
             panel.add(new JLabel("Email:")); panel.add(emailField);
             panel.add(new JLabel("Phone:")); panel.add(phoneField);
             panel.add(new JLabel("Role:")); panel.add(roleCombo);
             panel.add(new JLabel("Username:")); panel.add(usernameField);
-    
+
             int result = JOptionPane.showConfirmDialog(this, panel, "Create New Profile", JOptionPane.OK_CANCEL_OPTION);
             if (result == JOptionPane.OK_OPTION) {
                 String name = nameField.getText();
@@ -790,25 +790,25 @@ public class LoginFrame extends JFrame {
                 String phone = phoneField.getText();
                 String role = (String) roleCombo.getSelectedItem();
                 String username = usernameField.getText();
-    
+
                 if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || username.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "All fields must be filled!");
                     return;
                 }
-    
+
                 if (User.loadUser(username) != null) {
                     JOptionPane.showMessageDialog(this, "Username already exists!");
                     return;
                 }
-    
+
                 String tempPassword = "temp" + System.currentTimeMillis();
                 ((Admin) user).createUser(role, username, tempPassword, name, email, phone);
 
 
-                JOptionPane.showMessageDialog(this, 
-                "New Employee Profile Created!\n\nUsername: " + username + 
-                "\nTemporary Password: " + tempPassword + 
-                "\n\nShare this manually with the employee.", 
+                JOptionPane.showMessageDialog(this,
+                "New Employee Profile Created!\n\nUsername: " + username +
+                "\nTemporary Password: " + tempPassword +
+                "\n\nShare this manually with the employee.",
                 "Profile Created", JOptionPane.INFORMATION_MESSAGE);
 
 
@@ -830,7 +830,7 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "No employees found.");
                 return;
             }
-        
+
             String[] columnNames = {"Name", "Email", "Phone", "Role", "Username", "Active", "Permissions"};
             DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
             for (User u : users) {
@@ -840,7 +840,7 @@ public class LoginFrame extends JFrame {
                     getPermissions(u)
                 });
             }
-        
+
             JTable table = new JTable(tableModel) {
                 @Override
                 public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
@@ -856,13 +856,13 @@ public class LoginFrame extends JFrame {
             table.setEnabled(false);
             JScrollPane scrollPaneTable = new JScrollPane(table);
             scrollPaneTable.setPreferredSize(new Dimension(600, 300));
-        
+
             JPanel optionsPanel = new JPanel(new GridLayout(2, 1));
             JButton toggleActiveButton = new JButton("Toggle Active Status");
             JButton editPermissionsButton = new JButton("Edit Permissions");
             optionsPanel.add(toggleActiveButton);
             optionsPanel.add(editPermissionsButton);
-        
+
             toggleActiveButton.addActionListener(e -> {
                 try {
                     toggleActiveStatus(users);
@@ -873,13 +873,13 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
                 }
             });
-        
+
             editPermissionsButton.addActionListener(e -> editPermissions(users, table));
-        
+
             JOptionPane.showOptionDialog(this, new Object[]{scrollPaneTable, optionsPanel}, "Employee List",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.PLAIN_MESSAGE, null, new Object[]{"OK"}, "OK");
         }
-        
+
         /**
          * Reload and display updated employee information
          *
@@ -899,7 +899,7 @@ public class LoginFrame extends JFrame {
             }
             model.fireTableDataChanged(); // Refresh the table display
         }
-    
+
         /**
          * Toggle user active status
          *
@@ -919,17 +919,17 @@ public class LoginFrame extends JFrame {
                 }
                 System.out.println("After toggle in memory: isActive = " + targetUser.isActive() + ", failedAttempts = " + targetUser.getFailedAttempts());
                 dealership.updateUser(targetUser); // Update the DB
-                
+
                 // Verify database update
                 User refreshedUser = User.loadUser(username); // Reload from DB
                 System.out.println("After DB update, reloaded isActive = " + refreshedUser.isActive() + ", failedAttempts = " + refreshedUser.getFailedAttempts());
-                
+
                 JOptionPane.showMessageDialog(this, "User " + username + " is now " + (refreshedUser.isActive() ? "active" : "inactive"));
             } else {
                 JOptionPane.showMessageDialog(this, "User not found!");
             }
         }
-    
+
         /**
          * Edit user permissions
          *
@@ -939,7 +939,7 @@ public class LoginFrame extends JFrame {
         private void editPermissions(List<User> users, JTable table) {
             String username = JOptionPane.showInputDialog(this, "Enter username to edit permissions:");
             if (username == null) return;
-        
+
             try {
                 User targetUser = User.loadUser(username);
                 if (targetUser == null) {
@@ -950,11 +950,11 @@ public class LoginFrame extends JFrame {
                     JOptionPane.showMessageDialog(this, "Cannot edit permissions for an inactive user!");
                     return;
                 }
-        
+
                 // Load current permissions from the database
                 targetUser.loadPermissions(); // Ensure this method is implemented in User class
                 Map<String, Boolean> currentPerms = targetUser.getPermissionsMap();
-        
+
                 // Define permissions to match the database (use the exact names from the permissions table)
                 String[] dbPermissions = {
                     "ADD_VEHICLE", "EDIT_VEHICLE", "MANAGE_USERS", "REMOVE_VEHICLE",
@@ -967,7 +967,7 @@ public class LoginFrame extends JFrame {
                     "Reset Passwords", "Search Vehicles", "Sell Vehicle", "View Dealership Info",
                     "View Sales History"
                 };
-        
+
                 JPanel panel = new JPanel(new GridLayout(0, 1));
                 JCheckBox[] checkBoxes = new JCheckBox[dbPermissions.length];
                 for (int i = 0; i < dbPermissions.length; i++) {
@@ -975,7 +975,7 @@ public class LoginFrame extends JFrame {
                     checkBoxes[i].setSelected(currentPerms.getOrDefault(dbPermissions[i], false));
                     panel.add(checkBoxes[i]);
                 }
-        
+
                 int result = JOptionPane.showConfirmDialog(this, panel, "Edit Permissions for " + username, JOptionPane.OK_CANCEL_OPTION);
                 if (result == JOptionPane.OK_OPTION) {
                     // Update permissions in the database
@@ -999,7 +999,7 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage());
             }
         }
-        
+
         /**
          * Update user permissions in the database
          *
@@ -1012,7 +1012,7 @@ public class LoginFrame extends JFrame {
             DBManager db = DBManager.getInstance();
             // Clear existing permissions for the user
             db.runUpdate("DELETE FROM user_permissions WHERE user_id = ?", user.getId());
-        
+
             // Insert new permissions based on checkbox selections
             for (int i = 0; i < checkBoxes.length; i++) {
                 if (checkBoxes[i].isSelected()) {
@@ -1027,7 +1027,7 @@ public class LoginFrame extends JFrame {
                 }
             }
         }
-                
+
         /**
          * Manage password reset requests
          *
@@ -1044,18 +1044,18 @@ public class LoginFrame extends JFrame {
                 JOptionPane.showMessageDialog(this, "No password reset requests pending.");
                 return;
             }
-    
+
             StringBuilder requests = new StringBuilder("Password Reset Requests:\n\n");
             for (User u : passwordResetRequests) {
                 requests.append("Request by ").append(u.getName()).append(" (").append(u.getUsername())
                         .append(") at ").append(LocalDate.now()).append("\n");
             }
-    
+
             textArea = new JTextArea(requests.toString());
             textArea.setEditable(false);
             scrollPane = new JScrollPane(textArea);
             scrollPane.setPreferredSize(new Dimension(400, 300));
-    
+
             String username = JOptionPane.showInputDialog(this, new Object[]{scrollPane}, "Enter username to reset password:", JOptionPane.PLAIN_MESSAGE);
             if (username != null) {
                 User targetUser = User.loadUser(username);
@@ -1072,7 +1072,7 @@ public class LoginFrame extends JFrame {
                 }
             }
         }
-    
+
         /**
          * Get user permissions as formatted string
          *
@@ -1082,7 +1082,7 @@ public class LoginFrame extends JFrame {
         private String getPermissions(User user) {
             return user.getPermissions(); // Use dynamic permissions from User class
         }
-    
+
         /**
          * Apply standard styling to a button
          *
@@ -1094,7 +1094,7 @@ public class LoginFrame extends JFrame {
         private void setButtonStyle(JButton button, String color, int x, int y) {
             setButtonStyle(button, color, x, y, 150, 70);
         }
-    
+
         /**
          * Apply custom styling to a button
          *
@@ -1117,11 +1117,11 @@ public class LoginFrame extends JFrame {
                 this, "Are you sure you want to log out?", "Confirm Log Out",
                 JOptionPane.YES_NO_OPTION
             );
-        
+
             if (confirm == JOptionPane.YES_OPTION) {
                 System.out.println("Logging out...");
                 dispose(); // Close the current dashboard
-        
+
                 SwingUtilities.invokeLater(() -> {
                     LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
                     loginPage.setVisible(true);
@@ -1180,25 +1180,25 @@ public class LoginFrame extends JFrame {
              fileMenu.add(saveItem);
              menuBar.add(fileMenu);
              setJMenuBar(menuBar);
- 
- 
+
+
              // Add horizontal glue to push the logout button to the right
              menuBar.add(Box.createHorizontalGlue());
- 
+
              // Create logout button and add it to the menu bar
              JButton logoutButton = new JButton("Log Out");
              logoutButton.addActionListener(e -> handleLogout());
              menuBar.add(logoutButton);
- 
+
              setJMenuBar(menuBar);
-        
+
             // Variables to track button positions dynamically
             int xPos = 20;
             int yPos = 40;
             int buttonWidth = 150;
             int buttonHeight = 70;
             int spacing = 160;
-        
+
             // Conditionally add buttons based on permissions
             if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", true)) {
                 searchCarButton = new JButton("Search");
@@ -1211,7 +1211,7 @@ public class LoginFrame extends JFrame {
                 add(searchCarButton);
                 xPos += spacing;
             }
-        
+
             if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
                 addVehicleButton = new JButton("Add Vehicle");
                 addVehicleButton.setBackground(Color.decode("#F6CA94"));
@@ -1223,7 +1223,7 @@ public class LoginFrame extends JFrame {
                 add(addVehicleButton);
                 xPos += spacing;
             }
-        
+
             if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
                 sellVehicleButton = new JButton("Sell Vehicle");
                 sellVehicleButton.setBackground(Color.decode("#FAFABE"));
@@ -1235,7 +1235,7 @@ public class LoginFrame extends JFrame {
                 add(sellVehicleButton);
                 xPos += spacing;
             }
-        
+
             if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
                 removeVehicleButton = new JButton("Remove Vehicle");
                 removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
@@ -1247,7 +1247,7 @@ public class LoginFrame extends JFrame {
                 add(removeVehicleButton);
                 xPos += spacing;
             }
-        
+
             if (user.getPermissionsMap().getOrDefault("EDIT_VEHICLE", false)) {
                 editVehicleButton = new JButton("Edit Vehicle");
                 editVehicleButton.setBackground(Color.decode("#C7CAFF"));
@@ -1259,7 +1259,7 @@ public class LoginFrame extends JFrame {
                 add(editVehicleButton);
                 xPos += spacing;
             }
-        
+
             if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
                 salesHistoryButton = new JButton("Sales History");
                 salesHistoryButton.setBackground(Color.decode("#CDABEB"));
@@ -1271,8 +1271,8 @@ public class LoginFrame extends JFrame {
                 add(salesHistoryButton);
                 xPos += spacing;
             }
-        
-        
+
+
             if (user.getPermissionsMap().getOrDefault("VIEW_DEALERSHIP_INFO", false)) {
                 dealershipInfoButton = new JButton("Dealership Info");
                 dealershipInfoButton.setBackground(Color.decode("#FFD700"));
@@ -1289,7 +1289,7 @@ public class LoginFrame extends JFrame {
          * Handle action events from manager dashboard components
          *
          * @param e - the action event to be processed
-         */ 
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             if (e.getSource() == searchCarButton) {
@@ -1299,7 +1299,7 @@ public class LoginFrame extends JFrame {
                     JPanel filterPanel = new JPanel(new GridLayout(0, 2));
                     JTextField makeField = new JTextField();
                     JTextField modelField = new JTextField();
-               
+
                     JSlider minYearSlider = new JSlider(2000, 2025, 2000);
                     JSlider maxPriceSlider = new JSlider(0, 100000, 20000);
                     JLabel minYearLabel = new JLabel("2000", SwingConstants.CENTER);
@@ -1309,7 +1309,7 @@ public class LoginFrame extends JFrame {
                     minYearSlider.setPaintTicks(true);
                     minYearSlider.setPaintLabels(true);
                     minYearSlider.addChangeListener(ev -> minYearLabel.setText(String.valueOf(minYearSlider.getValue())));
-                    
+
                     // Set only min and max labels
                     Hashtable<Integer, JLabel> yearLabels = new Hashtable<>();
                     yearLabels.put(2000, new JLabel("2000"));
@@ -1345,7 +1345,7 @@ public class LoginFrame extends JFrame {
                             int minYear = minYearSlider.getValue();
                             double maxPrice = maxPriceSlider.getValue();
 
-                            
+
                             String filteredResult = filterInventory(make, model, minYear, maxPrice);
                             showResults(filteredResult);
                         } else if (result == 2) { // "Display All" clicked
@@ -1353,7 +1353,7 @@ public class LoginFrame extends JFrame {
                             showResults(allVehicles);
                         }
                     }
-                   
+
             } else if (e.getSource() == addVehicleButton) {
                 SwingUtilities.invokeLater(() -> {
                     if (!dealership.isFull()) {
@@ -1384,7 +1384,7 @@ public class LoginFrame extends JFrame {
                     } catch (SQLException sqlException) {
                         JOptionPane.showMessageDialog(this, "An error occurred while selling the vehicle: " + sqlException.getMessage());
                     }
-                
+
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(this, "Invalid input. Please enter a valid integer.");
                 }
@@ -1552,12 +1552,12 @@ public class LoginFrame extends JFrame {
             for (Vehicle vehicle : dealership.getVehicles()) {
                 if (vehicle == null) continue;
                 boolean matches = true;
-    
+
                 if (make != null && !vehicle.getMake().equalsIgnoreCase(make)) matches = false;
                 if (model != null && !vehicle.getModel().equalsIgnoreCase(model)) matches = false;
                 if (minYear != null && vehicle.getYear() < minYear) matches = false;
                 if (maxPrice != null && vehicle.getPrice() > maxPrice) matches = false;
-    
+
                 if (matches) {
                     result.append(vehicle.toString()).append("\n--------------------\n");
                 }
@@ -1569,17 +1569,49 @@ public class LoginFrame extends JFrame {
                 this, "Are you sure you want to log out?", "Confirm Log Out",
                 JOptionPane.YES_NO_OPTION
             );
-        
+
             if (confirm == JOptionPane.YES_OPTION) {
                 System.out.println("Logging out...");
                 dispose(); // Close the current dashboard
-        
+
                 SwingUtilities.invokeLater(() -> {
                     LoginFrame loginPage = new LoginFrame(dealership); // Pass dealership
                     loginPage.setVisible(true);
                 });
             }
-        }   
+        }
+        private void displaySalesHistory() {
+          JTextArea textArea = new JTextArea(dealership.showSalesHistory());
+          textArea.setEditable(false);
+          JScrollPane scrollPane = new JScrollPane(textArea);
+          scrollPane.setPreferredSize(new Dimension(400, 300));
+
+          JPanel mainPanel = new JPanel(new BorderLayout());
+          mainPanel.add(scrollPane, BorderLayout.CENTER);
+
+          JOptionPane optionPane = new JOptionPane(
+              mainPanel,
+              JOptionPane.PLAIN_MESSAGE,
+              JOptionPane.OK_CANCEL_OPTION
+          );
+
+          optionPane.setOptions(new Object[]{"OK", "Report"});
+
+          JDialog dialog = optionPane.createDialog(this, "Sales History");
+          dialog.setModal(true);
+          dialog.setLocationRelativeTo(this);
+          dialog.setVisible(true);
+
+          Object selectedValue = optionPane.getValue();
+          if (selectedValue instanceof String) {
+              String choice = (String) selectedValue;
+              if ("Report".equals(choice)) {
+                  ReportMenu reportMenu = new ReportMenu(dialog);
+                  reportMenu.setVisible(true);
+              }
+          }
+      }
+
     }
 
     /**
@@ -1614,7 +1646,7 @@ public class LoginFrame extends JFrame {
             initializeUI();
             setLocationRelativeTo(null);
         }
-    
+
         /**
          * Initialize the salesperson dashboard UI components
          * Sets up buttons and menu items based on salesperson permissions
@@ -1623,7 +1655,7 @@ public class LoginFrame extends JFrame {
             JLabel welcomeLabel = new JLabel("Welcome " + user.getName() + "!" + " - Salesperson");
             welcomeLabel.setBounds(20, 10, 300, 25);
             add(welcomeLabel);
-    
+
             menuBar = new JMenuBar();
             fileMenu = new JMenu("File");
             saveItem = new JMenuItem("Save");
@@ -1636,13 +1668,13 @@ public class LoginFrame extends JFrame {
             logoutButton.addActionListener(e -> handleLogout());
             menuBar.add(logoutButton);
             setJMenuBar(menuBar);
-    
+
             int xPos = 180; // Adjusted starting position for more buttons
             int yPos = 40;
             int buttonWidth = 150;
             int buttonHeight = 70;
             int spacing = 160;
-    
+
             if (user.getPermissionsMap().getOrDefault("ADD_VEHICLE", false)) {
                 addVehicleButton = new JButton("Add Vehicle");
                 addVehicleButton.setBackground(Color.decode("#F6CA94"));
@@ -1654,7 +1686,7 @@ public class LoginFrame extends JFrame {
                 add(addVehicleButton);
                 xPos += spacing;
             }
-    
+
             if (user.getPermissionsMap().getOrDefault("SELL_VEHICLE", false)) {
                 sellVehicleButton = new JButton("Sell Vehicle");
                 sellVehicleButton.setBackground(Color.decode("#FAFABE"));
@@ -1666,7 +1698,7 @@ public class LoginFrame extends JFrame {
                 add(sellVehicleButton);
                 xPos += spacing;
             }
-    
+
             if (user.getPermissionsMap().getOrDefault("REMOVE_VEHICLE", false)) {
                 removeVehicleButton = new JButton("Remove Vehicle");
                 removeVehicleButton.setBackground(Color.decode("#C1EBC0"));
@@ -1678,7 +1710,7 @@ public class LoginFrame extends JFrame {
                 add(removeVehicleButton);
                 xPos += spacing;
             }
-    
+
             if (user.getPermissionsMap().getOrDefault("SEARCH_VEHICLES", false)) {
                 searchCarButton = new JButton("Search");
                 searchCarButton.setBackground(Color.decode("#F6C2F3"));
@@ -1690,7 +1722,7 @@ public class LoginFrame extends JFrame {
                 add(searchCarButton);
                 xPos += spacing;
             }
-    
+
             if (user.getPermissionsMap().getOrDefault("VIEW_SALES_HISTORY", false)) {
                 salesHistoryButton = new JButton("Sales History");
                 salesHistoryButton.setBackground(Color.decode("#CDABEB"));
@@ -1702,7 +1734,7 @@ public class LoginFrame extends JFrame {
                 add(salesHistoryButton);
             }
         }
-    
+
         /**
          * Handle action events from salesperson dashboard components
          *
@@ -1787,7 +1819,7 @@ public class LoginFrame extends JFrame {
                     JPanel filterPanel = new JPanel(new GridLayout(0, 2));
                     JTextField makeField = new JTextField();
                     JTextField modelField = new JTextField();
-               
+
                     JSlider minYearSlider = new JSlider(2000, 2025, 2000);
                     JSlider maxPriceSlider = new JSlider(0, 100000);
                     JLabel minYearLabel = new JLabel("2000", SwingConstants.CENTER);
@@ -1797,7 +1829,7 @@ public class LoginFrame extends JFrame {
                     minYearSlider.setPaintTicks(true);
                     minYearSlider.setPaintLabels(true);
                     minYearSlider.addChangeListener(ev -> minYearLabel.setText(String.valueOf(minYearSlider.getValue())));
-                    
+
                     // Set only min and max labels
                     Hashtable<Integer, JLabel> yearLabels = new Hashtable<>();
                     yearLabels.put(2000, new JLabel("2000"));
@@ -1833,7 +1865,7 @@ public class LoginFrame extends JFrame {
                             int minYear = minYearSlider.getValue();
                             double maxPrice = maxPriceSlider.getValue();
 
-                            
+
                             String filteredResult = filterInventory(make, model, minYear, maxPrice);
                             showResults(filteredResult);
                         } else if (result == 2) { // "Display All" clicked
@@ -1891,7 +1923,7 @@ public class LoginFrame extends JFrame {
             }
             return result.length() > 0 ? result.toString() : "No vehicles found matching the criteria.";
         }
-    
+
         /**
          * Display current inventory in a dialog
          * Shows all vehicles currently in the system
@@ -1922,6 +1954,6 @@ public class LoginFrame extends JFrame {
                     loginPage.setVisible(true);
                 });
             }
-        }  
+        }
     }
 }

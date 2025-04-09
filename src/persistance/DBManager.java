@@ -37,39 +37,51 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	private DBManager() throws SQLException {
-		// Try original path in user home directory
-		var fileSystem = FileSystems.getDefault();
-		m_dbPath = fileSystem.getPath(System.getProperty("user.home"), "dealership.sqlite3").toString();
+		// Search for the database file in multiple locations
+		File dbFile = null;
 		
-		// Check if file exists at original path
-		File dbFile = new File(m_dbPath);
+		// First try in the current directory
+		m_dbPath = new File("dealership.sqlite3").getAbsolutePath();
+		dbFile = new File(m_dbPath);
 		
-		if (!dbFile.exists()) {
-			// Fallback to the database in the current directory
-			m_dbPath = new File("dealership.sqlite3").getAbsolutePath();
-			System.out.println("Using fallback database location: " + m_dbPath);
-			
-			// Check if file exists in current directory
-			dbFile = new File(m_dbPath);
-			if (!dbFile.exists()) {
-				try {
-					// Try to get the directory of the running jar/class file
-					String currentDir = new File(".").getCanonicalPath();
-					
-					// Try database in current directory with relative path
-					m_dbPath = currentDir + File.separator + "dealership.sqlite3";
+		// Check if file exists in current directory
+		if (dbFile.exists()) {
+			System.out.println("Found database in current directory: " + m_dbPath);
+		} else {
+			// Try in the project root directory (one level up from current directory if in bin)
+			try {
+				String currentDir = new File(".").getCanonicalPath();
+				m_dbPath = currentDir + File.separator + "dealership.sqlite3";
+				dbFile = new File(m_dbPath);
+				
+				if (dbFile.exists()) {
+					System.out.println("Found database in project root: " + m_dbPath);
+				} else {
+					// Try in the user's home directory
+					var fileSystem = FileSystems.getDefault();
+					m_dbPath = fileSystem.getPath(System.getProperty("user.home"), "dealership.sqlite3").toString();
 					dbFile = new File(m_dbPath);
 					
-					if (!dbFile.exists()) {
-						// Final fallback: use absolute path to the database in the project directory
-						m_dbPath = "/var/home/mpersico/distrobox/ubuntu-5541/MyCarDealershipSystem/original_repo/dealership.sqlite3";
-						System.out.println("Using absolute path fallback: " + m_dbPath);
+					if (dbFile.exists()) {
+						System.out.println("Found database in user home: " + m_dbPath);
+					} else {
+						// Final attempt: look in the parent directory
+						m_dbPath = new File("..").getCanonicalPath() + File.separator + "dealership.sqlite3";
+						dbFile = new File(m_dbPath);
+						
+						if (dbFile.exists()) {
+							System.out.println("Found database in parent directory: " + m_dbPath);
+						} else {
+							// If we still can't find it, use the current directory and will create a new database if needed
+							m_dbPath = new File("dealership.sqlite3").getAbsolutePath();
+							System.out.println("Using current directory for database: " + m_dbPath);
+						}
 					}
-				} catch (IOException e) {
-					// Use the absolute path as last resort
-					m_dbPath = "/var/home/mpersico/distrobox/ubuntu-5541/MyCarDealershipSystem/original_repo/dealership.sqlite3";
-					System.out.println("Using absolute path fallback: " + m_dbPath);
 				}
+			} catch (IOException e) {
+				// Fallback to current directory if there's an IO error
+				m_dbPath = new File("dealership.sqlite3").getAbsolutePath();
+				System.out.println("IO Error when searching for database. Using current directory: " + m_dbPath);
 			}
 		}
 
@@ -235,13 +247,30 @@ public class DBManager {
 		var dbFile = new File(m_dbPath);
 		var mustCreateTables = !dbFile.exists();
 
+		// Ensure parent directory exists
+		File parentDir = dbFile.getParentFile();
+		if (parentDir != null && !parentDir.exists()) {
+			boolean dirCreated = parentDir.mkdirs();
+			if (!dirCreated) {
+				System.out.println("Warning: Could not create parent directory for database. Will try to create database anyway.");
+			}
+		}
+
 		var url = "jdbc:sqlite:" + m_dbPath;
 		try {
+			// Make sure the JDBC driver is loaded
+			try {
+				Class.forName("org.sqlite.JDBC");
+			} catch (ClassNotFoundException e) {
+				System.out.println("SQLite JDBC driver not found. Using default driver.");
+			}
+			
 			m_connection = DriverManager.getConnection(url);
-			System.out.println("Connection to SQLite has been established.");
+			System.out.println("Connection to SQLite has been established at: " + m_dbPath);
 			m_connection.setAutoCommit(false);
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
+			System.out.println("Error connecting to database: " + e.getMessage());
+			throw e; // Re-throw the exception to allow proper handling
 		}
 
 		if (!mustCreateTables) {
@@ -250,7 +279,9 @@ public class DBManager {
 			System.out.println("Creating the DB file " + m_dbPath + " and the tables.");
 			createTables();
 		}
-    migrateSchema();
+		
+		// Always try to migrate the schema to ensure it's up to date
+		migrateSchema();
 	}
 
   private void migrateSchema() {

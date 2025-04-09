@@ -23,6 +23,12 @@ public class DBManager {
 	private static DBManager m_dbManager;
 	private String m_dbPath;
 	private Connection m_connection;
+	
+	// Flag to track if we're in test mode
+	private boolean isTestMode = false;
+	
+	// Test connection for in-memory database
+	private Connection m_testConnection;
 
 	/**
 	 * Private constructor for the DBManager class
@@ -31,8 +37,41 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	private DBManager() throws SQLException {
+		// Try original path in user home directory
 		var fileSystem = FileSystems.getDefault();
 		m_dbPath = fileSystem.getPath(System.getProperty("user.home"), "dealership.sqlite3").toString();
+		
+		// Check if file exists at original path
+		File dbFile = new File(m_dbPath);
+		
+		if (!dbFile.exists()) {
+			// Fallback to the database in the current directory
+			m_dbPath = new File("dealership.sqlite3").getAbsolutePath();
+			System.out.println("Using fallback database location: " + m_dbPath);
+			
+			// Check if file exists in current directory
+			dbFile = new File(m_dbPath);
+			if (!dbFile.exists()) {
+				try {
+					// Try to get the directory of the running jar/class file
+					String currentDir = new File(".").getCanonicalPath();
+					
+					// Try database in current directory with relative path
+					m_dbPath = currentDir + File.separator + "dealership.sqlite3";
+					dbFile = new File(m_dbPath);
+					
+					if (!dbFile.exists()) {
+						// Final fallback: use absolute path to the database in the project directory
+						m_dbPath = "/var/home/mpersico/distrobox/ubuntu-5541/MyCarDealershipSystem/original_repo/dealership.sqlite3";
+						System.out.println("Using absolute path fallback: " + m_dbPath);
+					}
+				} catch (IOException e) {
+					// Use the absolute path as last resort
+					m_dbPath = "/var/home/mpersico/distrobox/ubuntu-5541/MyCarDealershipSystem/original_repo/dealership.sqlite3";
+					System.out.println("Using absolute path fallback: " + m_dbPath);
+				}
+			}
+		}
 
 		initDB();
 	}
@@ -45,12 +84,15 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	public void runInsert(String query, Object... params) throws SQLException {
-		var stmt = m_connection.prepareStatement(query);
+		System.out.println("Will run insert query: " + query + (isTestMode ? " [TEST MODE]" : ""));
+		// Use the appropriate connection based on test mode status
+		Connection conn = this.Connection();
+		var stmt = conn.prepareStatement(query);
 		for (int i = 0; i < params.length; i++) {
 			stmt.setObject(i + 1, params[i]);
 		}
 		stmt.execute();
-		m_connection.commit();
+		conn.commit();
 	}
 
 	/**
@@ -62,12 +104,32 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	public ResultSet runQuery(String query, Object... params) throws SQLException {
-		System.out.println("Will run query: " + query);
-		var stmt = m_connection.prepareStatement(query);
+		System.out.println("Will run query: " + query + (isTestMode ? " [TEST MODE]" : ""));
+		// Debug parameter information
+		System.out.println("Number of parameters: " + params.length);
+		for (int i = 0; i < params.length; i++) {
+			System.out.println("Parameter " + (i+1) + ": " + (params[i] == null ? "null" : "'" + params[i].toString() + "'"));
+		}
+		
+		// Use the appropriate connection based on test mode status
+		Connection conn = this.Connection();
+		var stmt = conn.prepareStatement(query);
 		for (int i = 0; i < params.length; i++) {
 			stmt.setObject(i + 1, params[i]);
 		}
-		return stmt.executeQuery();
+		
+		// Execute the query and debug results
+		ResultSet rs = stmt.executeQuery();
+		System.out.println("Query executed successfully");
+		
+		// Debug if the ResultSet has any rows
+		if (rs.isBeforeFirst()) {
+			System.out.println("Query returned at least one row");
+		} else {
+			System.out.println("Query returned no rows");
+		}
+		
+		return rs;
 	}
 
   public static String getSalesRepresentativeReport() {
@@ -153,13 +215,15 @@ public class DBManager {
 	 * @throws SQLException if a database access error occurs
 	 */
 	public void runUpdate(String query, Object... params) throws SQLException {
-		System.out.println("Will run update query: " + query);
-		var stmt = m_connection.prepareStatement(query);
+		System.out.println("Will run update query: " + query + (isTestMode ? " [TEST MODE]" : ""));
+		// Use the appropriate connection based on test mode status
+		Connection conn = this.Connection();
+		var stmt = conn.prepareStatement(query);
 		for (int i = 0; i < params.length; i++) {
 			stmt.setObject(i + 1, params[i]);
 		}
 		stmt.execute();
-		m_connection.commit();
+		conn.commit();
 	}
 
 	/**
@@ -282,10 +346,166 @@ stmt.execute(userSQL);
 
 	/**
 	 * Get the database connection
+	 * Returns test connection if in test mode, otherwise returns regular connection
 	 *
 	 * @return the Connection object for the database
 	 */
 	public Connection Connection() throws SQLException {
-		return m_connection;
+		return isTestMode ? m_testConnection : m_connection;
+	}
+	
+	/**
+	 * Check if the system is currently in test mode
+	 *
+	 * @return true if in test mode, false otherwise
+	 */
+	public boolean isInTestMode() {
+		return isTestMode;
+	}
+
+	/**
+	 * Enter test mode with an in-memory database
+	 * Creates a temporary database with the same schema as the real database
+	 * and populates it with sample test data
+	 *
+	 * @throws SQLException if a database access error occurs
+	 */
+	public void enterTestMode() throws SQLException {
+		if (isTestMode) {
+			System.out.println("Already in test mode");
+			return; // Already in test mode
+		}
+		
+		System.out.println("Entering test mode with in-memory database");
+		
+		// Create in-memory database
+		m_testConnection = DriverManager.getConnection("jdbc:sqlite::memory:");
+		m_testConnection.setAutoCommit(false);
+		
+		// Copy schema from real database to in-memory database
+		copySchemaToTestDB();
+		
+		// Generate sample test data
+		generateTestData();
+		
+		isTestMode = true;
+		System.out.println("Test mode activated successfully");
+	}
+	
+	/**
+	 * Exit test mode and discard all changes made in the test database
+	 *
+	 * @throws SQLException if a database access error occurs
+	 */
+	public void exitTestMode() throws SQLException {
+		if (!isTestMode) {
+			System.out.println("Not in test mode");
+			return; // Not in test mode
+		}
+		
+		System.out.println("Exiting test mode");
+		
+		// Close test connection (this will discard the in-memory database)
+		if (m_testConnection != null && !m_testConnection.isClosed()) {
+			m_testConnection.close();
+			m_testConnection = null;
+		}
+		
+		isTestMode = false;
+		System.out.println("Test mode deactivated, all test data discarded");
+	}
+	
+	/**
+	 * Copy schema from the real database to the test in-memory database
+	 * 
+	 * @throws SQLException if a database access error occurs
+	 */
+	private void copySchemaToTestDB() throws SQLException {
+		System.out.println("Copying database schema to test database");
+		
+		// Get the schema from the main database
+		ResultSet tables = m_connection.getMetaData().getTables(null, null, null, new String[]{"TABLE"});
+		
+		while (tables.next()) {
+			String tableName = tables.getString("TABLE_NAME");
+			
+			// Skip system tables
+			if (tableName.startsWith("sqlite_")) {
+				continue;
+			}
+			
+			System.out.println("Copying table structure: " + tableName);
+			
+			// Get the CREATE TABLE statement
+			ResultSet rs = m_connection.createStatement().executeQuery(
+					"SELECT sql FROM sqlite_master WHERE type='table' AND name='" + tableName + "'");
+			
+			if (rs.next()) {
+				String createTableSQL = rs.getString("sql");
+				if (createTableSQL != null) {
+					// Create the table in the test database
+					m_testConnection.createStatement().execute(createTableSQL);
+				}
+			}
+		}
+		
+		m_testConnection.commit();
+		System.out.println("Schema copied successfully");
+	}
+	
+	/**
+	 * Generate test data for the in-memory database
+	 * 
+	 * @throws SQLException if a database access error occurs
+	 */
+	private void generateTestData() throws SQLException {
+		System.out.println("Generating test data");
+		
+		// Create test admin
+		m_testConnection.createStatement().execute(
+				"INSERT INTO users (username, password, role_id, name, email, phone, is_active, is_temp_password) " +
+				"VALUES ('testadmin', 'test123', 1, 'Test Admin', 'testadmin@example.com', '555-000-0000', 1, 0)");
+		
+		// Create test manager
+		m_testConnection.createStatement().execute(
+				"INSERT INTO users (username, password, role_id, name, email, phone, is_active, is_temp_password) " +
+				"VALUES ('testmanager', 'test123', 2, 'Test Manager', 'testmanager@example.com', '555-000-0001', 1, 0)");
+		
+		// Create test salesperson
+		m_testConnection.createStatement().execute(
+				"INSERT INTO users (username, password, role_id, name, email, phone, is_active, is_temp_password) " +
+				"VALUES ('testsales', 'test123', 3, 'Test Salesperson', 'testsales@example.com', '555-000-0002', 1, 0)");
+		
+		// Create test dealership
+		m_testConnection.createStatement().execute(
+				"INSERT INTO dealerships (name, location, capacity) VALUES ('Test Dealership', 'Test Location', 50)");
+		
+		// Create sample vehicles (cars and motorcycles)
+		// Cars
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Vehicle (make, model, color, year, price, car_type, dealerships_id) " +
+				"VALUES ('Honda', 'Civic', 'Red', 2022, 25000, 'Sedan', 1)");
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Vehicle (make, model, color, year, price, car_type, dealerships_id) " +
+				"VALUES ('Toyota', 'Camry', 'Blue', 2021, 30000, 'Sedan', 1)");
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Vehicle (make, model, color, year, price, car_type, dealerships_id) " +
+				"VALUES ('Ford', 'F-150', 'Black', 2023, 45000, 'Truck', 1)");
+		
+		// Motorcycles
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Vehicle (make, model, color, year, price, handlebar_type, dealerships_id) " +
+				"VALUES ('Harley-Davidson', 'Street 750', 'Black', 2022, 8000, 'Cruiser', 1)");
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Vehicle (make, model, color, year, price, handlebar_type, dealerships_id) " +
+				"VALUES ('Yamaha', 'YZF R1', 'Blue', 2023, 12000, 'Sport', 1)");
+		
+		// Create sample sales
+		m_testConnection.createStatement().execute(
+				"INSERT INTO Sales (vehicle_id, user_id, buyer_name, buyer_contact, sale_date) " +
+				"VALUES (2, 3, 'John Doe', 'john@example.com', '2023-01-15 14:30:00')");
+		
+		m_testConnection.commit();
+		System.out.println("Test data generation complete");
 	}
 }

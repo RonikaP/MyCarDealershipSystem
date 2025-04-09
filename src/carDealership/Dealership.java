@@ -202,14 +202,77 @@ public class Dealership implements Serializable {
         }
         return -1;
     }
+    
+    /**
+     * Refreshes the dealership data when test mode is toggled
+     * Call this when entering or exiting test mode
+     * 
+     * @throws SQLException if a database access error occurs
+     */
+    public void refreshOnTestModeChange() throws SQLException {
+        // Clear the inventory and reload from the new database connection
+        reloadInventoryFromDatabase();
+    }
 
     /**
      * Getter method for the dealership inventory
+     * Loads vehicles from the database to ensure we're showing data from the current connection (test or real)
      *
      * @return array of vehicles in the inventory
      */
     public Vehicle[] getVehicles() {
-        return inventory; // No SQLException, uses in-memory data
+        // No need to reload every time - the inventory is already maintained by add/remove/sell
+        // operations through the correct database connection
+        return inventory;
+    }
+    
+    /**
+     * Reloads the inventory from the current database connection
+     * Ensures we're showing the correct vehicles based on test/normal mode
+     * 
+     * @throws SQLException if a database access error occurs
+     */
+    private void reloadInventoryFromDatabase() throws SQLException {
+        // Clear existing inventory
+        for (int i = 0; i < inventory.length; i++) {
+            inventory[i] = null;
+        }
+        nv = 0;
+        
+        // Reload from current database connection
+        DBManager db = DBManager.getInstance();
+        ResultSet rs = db.runQuery("SELECT * FROM Vehicle WHERE dealerships_id = ? AND is_sold = 0", 
+                                 m_dealershipLayer.getDealershipId());
+        
+        while (rs.next() && nv < inventory.length) {
+            int id = rs.getInt("vehicle_id");
+            String make = rs.getString("make");
+            String model = rs.getString("model");
+            String color = rs.getString("color");
+            int year = rs.getInt("year");
+            double price = rs.getDouble("price");
+            
+            // Determine if it's a car or motorcycle based on which specific field is not null
+            String carType = rs.getString("car_type");
+            String handlebarType = rs.getString("handlebar_type");
+            
+            if (carType != null) {
+                // It's a car
+                Car car = new Car(make, model, color, year, price, carType);
+                car.setId(id);
+                inventory[nv++] = car;
+            } else if (handlebarType != null) {
+                // It's a motorcycle
+                Motorcycle motorcycle = new Motorcycle(make, model, color, year, price, handlebarType);
+                motorcycle.setId(id);
+                inventory[nv++] = motorcycle;
+            }
+            
+            // Update nextId to be greater than any loaded ID
+            if (id >= nextId) {
+                nextId = id + 1;
+            }
+        }
     }
 
     /**
@@ -257,21 +320,77 @@ public class Dealership implements Serializable {
 
     /**
      * Generate a formatted string of the dealership's sales history
+     * Loads sales directly from the database to ensure we're showing data from the current connection (test or real)
      *
      * @return formatted string containing the sales history
      */
     public String showSalesHistory() {
-        String string = "Sales History:\n";
-        if (ns == 0) {
-            return "No sales recorded.";
+        StringBuilder string = new StringBuilder("Sales History:\n");
+        
+        try {
+            // Load sales from the database to ensure we're using the right connection
+            DBManager db = DBManager.getInstance();
+            ResultSet rs = db.runQuery(
+                "SELECT s.*, v.make, v.model, v.color, v.year, v.price, v.car_type, v.handlebar_type " +
+                "FROM Sales s JOIN Vehicle v ON s.vehicle_id = v.vehicle_id " +
+                "WHERE v.dealerships_id = ?",
+                m_dealershipLayer.getDealershipId()
+            );
+            
+            boolean hasSales = false;
+            
+            while (rs.next()) {
+                hasSales = true;
+                int vehicleId = rs.getInt("vehicle_id");
+                String make = rs.getString("make");
+                String model = rs.getString("model");
+                String color = rs.getString("color");
+                int year = rs.getInt("year");
+                double price = rs.getDouble("price");
+                String carType = rs.getString("car_type");
+                String handlebarType = rs.getString("handlebar_type");
+                
+                Vehicle vehicle;
+                if (carType != null) {
+                    vehicle = new Car(make, model, color, year, price, carType);
+                } else {
+                    vehicle = new Motorcycle(make, model, color, year, price, handlebarType);
+                }
+                vehicle.setId(vehicleId);
+                
+                String buyerName = rs.getString("buyer_name");
+                String buyerContact = rs.getString("buyer_contact");
+                String saleDate = rs.getString("sale_date");
+                
+                string.append("-------------------\n")
+                      .append(vehicle.toString()).append("\n")
+                      .append("Buyer Name: ").append(buyerName).append("\n")
+                      .append("Buyer Contact: ").append(buyerContact).append("\n")
+                      .append("Sale Date: ").append(saleDate).append("\n");
+            }
+            
+            if (!hasSales) {
+                return "No sales recorded.";
+            }
+            
+        } catch (SQLException e) {
+            System.err.println("Error loading sales history: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Fallback to in-memory sales if DB access fails
+            if (ns == 0) {
+                return "No sales recorded.";
+            }
+            for (int i = 0; i < ns; i++) {
+                string.append("-------------------\n")
+                      .append(sales[i].getVehicle().toString()).append("\n")
+                      .append("Buyer Name: ").append(sales[i].getBuyerName()).append("\n")
+                      .append("Buyer Contact: ").append(sales[i].getBuyerContact()).append("\n")
+                      .append("Sale Date: ").append(sales[i].getSaleDate()).append("\n");
+            }
         }
-        for (int i = 0; i < ns; i++) {
-            string += "-------------------\n" + sales[i].getVehicle().toString() + "\n" +
-                    "Buyer Name: " + sales[i].getBuyerName() + "\n" +
-                    "Buyer Contact: " + sales[i].getBuyerContact() + "\n" +
-                    "Sale Date: " + sales[i].getSaleDate() + "\n";
-        }
-        return string + "-------------------\n";
+        
+        return string.append("-------------------\n").toString();
     }
 
     /**

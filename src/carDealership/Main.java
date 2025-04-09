@@ -6,6 +6,7 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 
 import persistance.DealershipLayer;
+import persistance.DBManager;
 
 import java.io.*;
 import java.sql.SQLException;
@@ -24,6 +25,12 @@ import java.sql.SQLException;
 public class Main {
 	public static Scanner input = new Scanner(System.in);
 	public static Dealership m_dealership;
+	
+	/**
+	 * Flag indicating whether the system is in test mode
+	 * In test mode, changes are not saved and data is discarded on exit
+	 */
+	public static boolean isTestMode = false;
 
 	/**
 	 * Main entry point for the Car Dealership application
@@ -459,5 +466,73 @@ public class Main {
 
 		outObjStream.writeObject(m_dealership);
 		outObjStream.close();
+	}
+	
+	/**
+	 * Enter test mode
+	 * Creates a temporary database environment that is discarded on exit
+	 * 
+	 * @return true if successfully entered test mode, false otherwise
+	 */
+	public static boolean enterTestMode() {
+		if (isTestMode) {
+			System.out.println("Already in test mode");
+			return false;
+		}
+		
+		try {
+			// Put database in test mode
+			DBManager dbManager = DBManager.getInstance();
+			dbManager.enterTestMode();
+			
+			// Set application test mode flag
+			isTestMode = true;
+			
+			// Refresh dealership data to reflect the test database state
+			if (m_dealership != null) {
+				m_dealership.refreshOnTestModeChange();
+			}
+			
+			System.out.println("Test mode activated - all changes will be discarded on exit");
+			return true;
+		} catch (SQLException e) {
+			System.err.println("Error entering test mode: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
+	}
+	
+	/**
+	 * Exit test mode
+	 * Discards all changes made in test mode
+	 * 
+	 * @return true if successfully exited test mode, false otherwise
+	 */
+	public static boolean exitTestMode() {
+		if (!isTestMode) {
+			System.out.println("Not in test mode");
+			return false;
+		}
+		
+		try {
+			// Exit database test mode
+			DBManager dbManager = DBManager.getInstance();
+			dbManager.exitTestMode();
+			
+			// Reset application test mode flag
+			isTestMode = false;
+			
+			// Refresh dealership data to reflect the normal database state
+			if (m_dealership != null) {
+				m_dealership.refreshOnTestModeChange();
+			}
+			
+			System.out.println("Test mode deactivated - all changes have been discarded");
+			return true;
+		} catch (SQLException e) {
+			System.err.println("Error exiting test mode: " + e.getMessage());
+			e.printStackTrace();
+			return false;
+		}
 	}
 }

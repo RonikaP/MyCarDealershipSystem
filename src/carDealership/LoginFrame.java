@@ -351,13 +351,17 @@ public class LoginFrame extends JFrame {
         private User user;
         private JButton searchCarButton, addVehicleButton, sellVehicleButton, removeVehicleButton,
                 editVehicleButton, salesHistoryButton, dealershipInfoButton,
-                createProfileButton, employeeListButton, passwordManagementButton;
+                createProfileButton, employeeListButton, passwordManagementButton,
+                testModeButton;
         private JTextArea textArea;
         private JScrollPane scrollPane;
         private JMenuBar menuBar;
         private JMenu fileMenu;
         private JMenuItem saveItem, deleteDealershipItem;
         private JButton logoutButton = new JButton("Logout");
+        // Test mode indicator components
+        private JPanel testModeIndicator;
+        private JLabel testModeLabel;
 
         /**
          * Constructor for the AdminDashboard class
@@ -375,6 +379,9 @@ public class LoginFrame extends JFrame {
             getContentPane().setBackground(Color.decode("#ADD8E6"));
             initializeUI();
             setLocationRelativeTo(null);
+            
+            // Update UI based on current test mode status
+            updateTestModeUI(Main.isTestMode);
         }
 
         /**
@@ -478,10 +485,130 @@ public class LoginFrame extends JFrame {
             dealershipInfoButton.addActionListener(this);
             add(dealershipInfoButton);
             xPos += spacing;
+            
+            // Add test mode button for admin users
+            testModeButton = new JButton("Test Mode");
+            setButtonStyle(testModeButton, "#FF6347", xPos, yPos, 150, buttonHeight);
+            testModeButton.addActionListener(this);
+            add(testModeButton);
+            
+            // Create test mode indicator panel (initially hidden)
+            testModeIndicator = new JPanel();
+            testModeIndicator.setBounds(0, 200, getWidth(), 30);
+            testModeIndicator.setBackground(Color.RED);
+            testModeIndicator.setLayout(new FlowLayout(FlowLayout.CENTER));
+            
+            testModeLabel = new JLabel("TEST MODE - CHANGES WILL NOT BE SAVED");
+            testModeLabel.setForeground(Color.WHITE);
+            testModeLabel.setFont(new Font("Dialog", Font.BOLD, 16));
+            testModeIndicator.add(testModeLabel);
+            add(testModeIndicator);
+            testModeIndicator.setVisible(false);
 
             // Add action listeners for menu items
             saveItem.addActionListener(this);
             deleteDealershipItem.addActionListener(this);
+        }
+
+        /**
+         * Update the UI to reflect the current test mode status
+         * 
+         * @param isInTestMode true if test mode is active, false otherwise
+         */
+        private void updateTestModeUI(boolean isInTestMode) {
+            // Update test mode indicator visibility
+            testModeIndicator.setVisible(isInTestMode);
+            
+            // Update test mode button text
+            if (isInTestMode) {
+                testModeButton.setText("Exit Test Mode");
+                testModeButton.setBackground(Color.decode("#FF6347")); // Tomato red
+                // Add red border to the frame
+                getRootPane().setBorder(BorderFactory.createLineBorder(Color.RED, 5));
+                // Disable save functionality
+                saveItem.setEnabled(false);
+            } else {
+                testModeButton.setText("Enter Test Mode");
+                testModeButton.setBackground(Color.decode("#4CAF50")); // Green
+                // Remove border
+                getRootPane().setBorder(null);
+                // Enable save functionality
+                saveItem.setEnabled(true);
+            }
+            
+            // Update window title to indicate test mode
+            if (isInTestMode) {
+                setTitle("TEST MODE - Admin Dashboard - " + dealership.getName());
+            } else {
+                setTitle("Admin Dashboard - " + dealership.getName());
+            }
+            
+            // Repaint to ensure UI changes are visible
+            repaint();
+        }
+        
+        /**
+         * Toggle test mode on or off
+         */
+        private void toggleTestMode() {
+            if (Main.isTestMode) {
+                // Confirmation dialog for exiting test mode
+                int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Exit test mode? All changes made in test mode will be discarded.",
+                    "Exit Test Mode",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+                );
+                
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (Main.exitTestMode()) {
+                        updateTestModeUI(false);
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Test mode exited. All changes made in test mode have been discarded.",
+                            "Test Mode Exited",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Failed to exit test mode. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                }
+            } else {
+                // Confirmation dialog for entering test mode
+                int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "Enter test mode? This will create a temporary database environment.\n" +
+                    "All changes made in test mode will be discarded when you exit test mode.",
+                    "Enter Test Mode",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+                );
+                
+                if (confirm == JOptionPane.YES_OPTION) {
+                    if (Main.enterTestMode()) {
+                        updateTestModeUI(true);
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Test mode entered. Any changes made will not be saved to the production database.",
+                            "Test Mode Activated",
+                            JOptionPane.INFORMATION_MESSAGE
+                        );
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Failed to enter test mode. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                }
+            }
         }
 
         /**
@@ -494,9 +621,11 @@ public class LoginFrame extends JFrame {
             try {
                 // Add the logout button handler here
                 if (e.getSource() == logoutButton) {
-                // Log out logic goes here
-                System.exit(0); // for example, close the application
-                } if (e.getSource() == searchCarButton) {
+                    // Log out logic goes here
+                    System.exit(0); // for example, close the application
+                } else if (e.getSource() == testModeButton) {
+                    toggleTestMode();
+                } else if (e.getSource() == searchCarButton) {
                     if (dealership.isEmpty()) {
                         JOptionPane.showMessageDialog(this, "Inventory is empty!");
                     } else {
@@ -1115,6 +1244,35 @@ public class LoginFrame extends JFrame {
             button.setBorderPainted(false);
         }
         private void handleLogout() {
+            // If in test mode, ask to exit test mode first
+            if (Main.isTestMode) {
+                int testModeConfirm = JOptionPane.showConfirmDialog(
+                    this, 
+                    "You are currently in test mode. Exit test mode before logging out?\n" +
+                    "All changes made in test mode will be discarded.",
+                    "Exit Test Mode",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.WARNING_MESSAGE
+                );
+                
+                if (testModeConfirm == JOptionPane.CANCEL_OPTION) {
+                    return; // Cancel logout
+                } else if (testModeConfirm == JOptionPane.YES_OPTION) {
+                    // Exit test mode before logging out
+                    if (!Main.exitTestMode()) {
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "Failed to exit test mode. Please try again.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                        );
+                        return; // Cancel logout if test mode exit fails
+                    }
+                }
+                // If NO, continue with logout without exiting test mode
+            }
+            
+            // Regular logout confirmation
             int confirm = JOptionPane.showConfirmDialog(
                 this, "Are you sure you want to log out?", "Confirm Log Out",
                 JOptionPane.YES_NO_OPTION
